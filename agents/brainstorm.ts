@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
-import { spawn } from "bun";
 import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { spawn } from "bun";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 import brainstormMcp from "../settings/brainstorm.mcp.json" with {
@@ -15,6 +15,13 @@ import brainstormSettings from "../settings/brainstorm.settings.json" with {
 import brainstormSystemPrompt from "../system-prompts/brainstorm-prompt.md" with {
 	type: "text",
 };
+
+function resolvePath(relativeFromThisFile: string): string {
+	const url = new URL(relativeFromThisFile, import.meta.url);
+	return url.pathname;
+}
+
+const projectRoot = resolvePath("../");
 
 // Read user's idea from args
 const positionals = getPositionals();
@@ -57,26 +64,35 @@ Present them in a clear, numbered format and then ask which one I'd like to expl
 
 async function main() {
 	// Build Claude flags
-	const flags: ClaudeFlags = buildClaudeFlags({
-		...parsedArgs,
-		settings: brainstormSettings,
-		"mcp-config": [brainstormMcp],
-		"append-system-prompt": brainstormSystemPrompt,
-	});
+	const flags = buildClaudeFlags(
+		{
+			"append-system-prompt": brainstormSystemPrompt,
+			settings: JSON.stringify(brainstormSettings),
+		},
+		parsedArgs.values as ClaudeFlags,
+	);
 
 	// Add the prompt as positional argument
-	const args = [...flags, userPrompt];
+	const finalArgs = userPrompt ? [...flags, userPrompt] : [...flags];
 
 	// Spawn Claude with brainstorm settings
-	const claudeProcess = spawn(["claude", ...args], {
+	const claudeProcess = spawn(["claude", ...finalArgs], {
 		stdin: "inherit",
 		stdout: "inherit",
 		stderr: "inherit",
 		env: {
 			...process.env,
-			CLAUDE_PROJECT_DIR: process.cwd(),
+			CLAUDE_PROJECT_DIR: projectRoot,
 		},
 	});
+
+	const onExit = () => {
+		try {
+			claudeProcess.kill("SIGTERM");
+		} catch { }
+	};
+	process.on("SIGINT", onExit);
+	process.on("SIGTERM", onExit);
 
 	await claudeProcess.exited;
 	console.log(`\n✨ Brainstorming session saved to: ${tempFile}`);
