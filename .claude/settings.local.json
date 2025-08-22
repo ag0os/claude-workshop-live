@@ -1,9 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(echo $CLAUDE_PROJECT_DIR)",
-      "mcp__brain__Task"
-    ],
+    "allow": ["Bash(echo $CLAUDE_PROJECT_DIR)", "mcp__brain__Task"],
     "deny": []
   }
 }

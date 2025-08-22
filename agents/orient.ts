@@ -153,7 +153,6 @@ async function main() {
 		{
 			"append-system-prompt": orientSystemPrompt,
 			settings: JSON.stringify(orientSettings),
-			"mcp-config": JSON.stringify(orientMcp),
 		},
 		parsedArgs.values as ClaudeFlags,
 	);
@@ -172,7 +171,7 @@ async function main() {
 	const onExit = () => {
 		try {
 			child.kill("SIGTERM");
-		} catch {}
+		} catch { }
 	};
 
 	process.on("SIGINT", onExit);
