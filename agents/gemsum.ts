@@ -1,9 +1,10 @@
+#!/usr/bin/env -S bun run
 import * as path from "node:path";
 import { parseArgs } from "node:util";
 import {
-	createPartFromUri,
-	createUserContent,
-	GoogleGenAI,
+    createPartFromUri,
+    createUserContent,
+    GoogleGenAI,
 } from "@google/genai";
 
 const args = parseArgs({

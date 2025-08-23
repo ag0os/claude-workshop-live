@@ -222,3 +222,102 @@ bun run agents/orient.ts router --out-dir ./orientations --max-files 0 --ext ts,
 Output:
 - Creates a markdown file in `./orientations/` named like `authentication-YYYYMMDD-HHMMSS.md`.
 - Sections include: Overview, Files Referencing, Dependencies/Dependents (if file target), Functions Near Topic, Event Flow Hints, Tests Touching Topic, and Next Steps.
+
+## Agents & Prompts: Behaviors and Usage Scenarios
+
+This repo ships multiple focused agents wired to well-structured prompts. The prompts follow consistent best practices to improve reliability and parsing.
+
+### Common Prompt Expectations
+- Private scratchpad: agents think step-by-step privately; outputs contain results and rationale only (no chain-of-thought).
+- Structured outputs: agents emit XML-like tagged blocks per turn (e.g., `<turn>`, `<options>`, `<verification>`, `<commit>`, `<next>`) or domain blocks like `<orientation>`, `<planning>`, `<claude_md_update>`, `<github_examples>`, `<brainstorm>`.
+- Code fences: labeled with language and a filename comment; changes are minimal and reversible.
+- Tool safety: read before edit; avoid destructive commands; never expose secrets.
+- Decision loops: many prompts present EXACTLY 3 options and block for a `1/2/3` selection or a minimal modification.
+
+### When To Use Which Agent
+- `designer` (system-prompts/designer-prompt.md)
+  - Token-first design system work (colors/typography → atoms → organisms → pages).
+  - Produces `<turn>` blocks with 3 options, Storybook/Playwright MCP validation, and accessibility gates.
+  - Use when establishing or evolving design systems with visual validation.
+
+- `builder` (system-prompts/builder-prompt.md)
+  - Iterative implementation from a markdown plan, per-feature `<turn>` with plan/preview/verification/commit.
+  - User controls progression with proceed/modify/skip; tracks state and tests.
+  - Use for incremental, reviewable delivery from an agreed plan.
+
+- `refactor` (system-prompts/refactor-prompt.md; prompts/refactor-prompt.md)
+  - Internal-structure improvements that preserve external behavior; baselines first, small reversible steps.
+  - `<turn>` with options, parity verification, commit message, churn limits.
+  - Use to pay down tech debt without changing behavior.
+
+- `feature` (system-prompts/feature-prompt.md)
+  - Turn a dictated feature into shippable code with verifiable acceptance criteria.
+  - 3 options per step; `<turn>` includes verification plan before implementation.
+  - Use for net-new functionality from a narrative or user story.
+
+- `fix` (system-prompts/fix-prompt.md)
+  - Bug remediation with mandatory failing test before patch; `<turn>` format.
+  - Use for reliable, test-first bug fixes with guardrails.
+
+- `performance-tuner` (system-prompts/performance-tuner.md)
+  - Set targets, capture baselines, then smallest safe optimizations with measurement plan.
+  - Use for performance work where reproducibility matters.
+
+- `planner` (system-prompts/plan-generator.md)
+  - Proposes plans only; does not implement code. Produces `<planning>` with options and a commit/file-specific plan.
+  - Use to converge on an actionable plan before starting work; can be chained.
+
+- `orient` (system-prompts/orient-prompt.md)
+  - Orientation analysis with `<orientation>` output: overview, structure, tech, commands, workflow, recent, next.
+  - Use when onboarding to a repo or scoping a change area.
+
+- `update-claudemd` (system-prompts/update-claudemd-prompt.md)
+  - Maintains CLAUDE.md; emits `<claude_md_update>` with summary/diff/updated file/verification.
+  - Use to create or refresh project memory for Claude Code.
+
+- `brainstorm` (system-prompts/brainstorm-prompt.md)
+  - Generates 5 distinct agent ideas; `<brainstorm>` with `<ideas>` and a recommendation.
+  - Use for ideation before committing to an approach.
+
+- `github-examples` (prompts/github-examples.md)
+  - Searches GitHub for real-world examples and writes `ai/github-examples/<slug>.md`.
+  - Emits `<github_examples>` block with examples, comparisons, and path.
+  - Use to discover patterns, validate approaches, or gather inspiration.
+
+- `claude-mix` (prompts/claude-mix.md)
+  - Repomix-focused flows for packing repos and generating analysis; structured outputs when saving/parsing.
+  - Use to produce compact repository representations for downstream LLMs.
+
+- `claude-video` / `gemsum`
+  - Gemini-powered video analysis and summarization; `claude-video` can pass extracted instructions to Claude.
+  - Requires `GEMINI_API_KEY`; writes outputs under `ai/claude-video` or `ai/gemsum`.
+  - Use to extract comprehensive instructions or summaries from .mp4 content.
+
+- `jsonl-formatter(.ts/.tsx)`
+  - Runs Claude in JSONL print mode and demonstrates jq recipes to extract insights.
+  - Use to learn/automate JSONL parsing for costs, tools, models, content, and timelines.
+
+- `parallel`
+  - Splits a task into independent subtasks and runs them concurrently via Claude.
+  - Use to parallelize well-separated work items; be mindful of model cost.
+
+- `chain`
+  - Runs `planner` to generate a plan and then launches `contain` with that plan preloaded.
+  - Use to move from planning → constrained execution in one command.
+
+- `contain`
+  - Launches Claude with repo-scoped settings/MCP (container-style environment); consistent, reproducible context.
+  - Use for “standardized” sessions across machines or teams.
+
+- Conversation utilities: `latest`, `search`, `conv`
+  - Map current repo to `~/.claude/projects` and inspect/export JSONL conversations.
+  - Use to quickly find and export past sessions or generate transcripts.
+
+### Credentials & Tools
+- Gemini features require `GEMINI_API_KEY` in the environment.
+- Some agents fetch secrets via 1Password CLI (`op`)—ensure you’re signed in.
+- GitHub MCP usage requires a valid token (see agents/github-examples.ts notes).
+
+### Runtime Consistency
+- All CLI agents use a Bun shebang and handle SIGINT/SIGTERM to cleanly stop child processes.
+- Prompts enforce structured outputs, three-option decision loops where relevant, and non-destructive tool use.

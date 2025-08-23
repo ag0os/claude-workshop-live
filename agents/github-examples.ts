@@ -1,3 +1,4 @@
+#!/usr/bin/env -S bun run
 import { parseArgs } from "node:util";
 import { type McpServerConfig, query } from "@anthropic-ai/claude-code";
 import { $ } from "bun";

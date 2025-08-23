@@ -1,3 +1,4 @@
+#!/usr/bin/env -S bun run
 import { GoogleGenAI } from "@google/genai";
 import { $ } from "bun";
 import { encoding_for_model } from "tiktoken";
@@ -10,10 +11,16 @@ import { readMostRecentJsonlAsText } from "../lib/jsonl";
 // Get key from https://aistudio.google.com/apikey
 // Store it in 1Password
 // op item create --category="API Credential" --title="GEMINI_API_KEY_FREE" --vault="Employee" credential="<your-api-key>"
-const apiKey =
-	await $`op item get "GEMINI_API_KEY_FREE" --fields credential --reveal`
-		.quiet()
-		.text();
+const apiKey = (
+    await $`op item get "GEMINI_API_KEY_FREE" --fields credential --reveal`
+        .quiet()
+        .text()
+).trim();
+
+if (!apiKey) {
+    console.error("Failed to retrieve GEMINI_API_KEY from 1Password. Ensure 'op' is signed in and the item exists.");
+    process.exit(1);
+}
 
 const ai = new GoogleGenAI({
 	apiKey,

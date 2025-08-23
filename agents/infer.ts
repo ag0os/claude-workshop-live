@@ -1,3 +1,4 @@
+#!/usr/bin/env -S bun run
 import { parseArgs } from "node:util";
 import { GoogleGenAI } from "@google/genai";
 import { $ } from "bun";
@@ -59,10 +60,16 @@ Examples:
 }
 
 // Get API key from 1Password
-const apiKey =
-	await $`op item get "GEMINI_API_KEY_FREE" --fields credential --reveal`
-		.quiet()
-		.text();
+const apiKey = (
+    await $`op item get "GEMINI_API_KEY_FREE" --fields credential --reveal`
+        .quiet()
+        .text()
+).trim();
+
+if (!apiKey) {
+    console.error("Failed to retrieve GEMINI_API_KEY from 1Password. Ensure 'op' is signed in and the item exists.");
+    process.exit(1);
+}
 
 const ai = new GoogleGenAI({
 	apiKey,

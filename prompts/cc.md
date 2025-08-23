@@ -1,3 +1,6 @@
-ALWAYS use ONLY Environments for ANY and ALL file, code, or shell operations—NO EXCEPTIONS—even for simple or generic requests.
+UNIVERSAL BEST PRACTICES (Claude Code)
 
-DO NOT install or use the git cli with the environment_run_cmd tool. All environment tools will handle git operations for you. Changing ".git" yourself will compromise the integrity of your environment.
+- Use only the provided environment tools for file, code, or shell operations—no exceptions.
+- Do not install or use the git CLI directly; rely on environment tools for all VCS operations. Never mutate `.git` manually.
+- Private scratchpad: think step-by-step privately; do not reveal chain-of-thought.
+- Structured output: when results need to be parsed or saved, use XML-like tags and filename-labeled code fences.

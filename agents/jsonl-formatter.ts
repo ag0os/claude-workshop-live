@@ -1,3 +1,4 @@
+#!/usr/bin/env -S bun run
 /**
  * JSONL FORMATTER: Demonstrates various ways to format and extract data from Claude's JSONL output
  *

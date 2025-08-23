@@ -2,6 +2,16 @@
 
 Use this as a generic addendum to append or prepend to any prompt to reinforce critical, outcome‑oriented behavior and verification discipline.
 
+### Universal Best Practices Addendum
+- Private scratchpad: critique privately; do not reveal chain-of-thought.
+- Structured output: When used, emit a compact <review> block containing:
+  <assumptions>bulleted list</assumptions>
+  <counterpoints>bulleted list</counterpoints>
+  <stress_tests>bulleted scenarios and outcomes</stress_tests>
+  <alternatives>viable alternative approaches</alternatives>
+  <recommendations>actionable changes to the plan/prompt</recommendations>
+  </review>
+
 **1) Assumptions you’re making**
 
 * *Three options are always optimal.* This constrains exploration and prevents “none of the above.” You partially mitigate this with “I choose 2 but …,” but that still nudges toward premature convergence.
@@ -28,5 +38,4 @@ Use this as a generic addendum to append or prepend to any prompt to reinforce c
 
 **5) Truth over agreement**
 These prompts impose a disciplined loop that prevents common failure modes: unverified features, “works on my machine” fixes, and risky refactors. The rigidity is a feature, not a bug, for workshops that teach **trustable AI‑assisted development**. The cost is overhead on small tasks and a mild bias toward web‑centric tooling. If you adopt them as defaults and consciously permit exceptions for trivial or non‑web tasks, they will improve clarity, auditability, and correctness without becoming process theater.
-
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env -S bun run
 /**
  * BUILDER: Launch Claude with a build partner system prompt appended
  *
@@ -28,8 +29,8 @@ function resolvePath(relativeFromThisFile: string): string {
 const projectRoot = resolvePath("../");
 
 async function main() {
-	const positionals = getPositionals();
-	const userPrompt = positionals.join(" ").trim();
+    const positionals = getPositionals();
+    const userPrompt = positionals.join(" ").trim();
 
 	// Merge user-provided flags with our defaults
 	const flags = buildClaudeFlags(
@@ -42,18 +43,26 @@ async function main() {
 	);
 	const args = userPrompt ? [...flags, userPrompt] : [...flags];
 
-	const child = spawn(["claude", ...args], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: projectRoot,
-		},
-	});
+    const child = spawn(["claude", ...args], {
+        stdin: "inherit",
+        stdout: "inherit",
+        stderr: "inherit",
+        env: {
+            ...process.env,
+            CLAUDE_PROJECT_DIR: projectRoot,
+        },
+    });
 
-	await child.exited;
-	process.exit(child.exitCode ?? 0);
+    const onExit = () => {
+        try {
+            child.kill("SIGTERM");
+        } catch {}
+    };
+    process.on("SIGINT", onExit);
+    process.on("SIGTERM", onExit);
+
+    await child.exited;
+    process.exit(child.exitCode ?? 0);
 }
 
 await main();
