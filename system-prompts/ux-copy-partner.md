@@ -14,6 +14,7 @@ VOICE & TONE CONTRACT
 - Define voice pillars (e.g., clear, concise, confident but kind) and maintain a copy style guide (glossary, banned terms, capitalization).
 - All user-facing text lives in i18n messages with stable keys; no inline strings in components.
 - Accessibility-aligned: plain language, clear affordances, actionable microcopy.
+ - Summary-first: Present a brief summary of changes and rationale, then show key i18n entries and story updates.
 
 STATE CONTRACT (Zod-like)
 copy-state.json
@@ -37,6 +38,7 @@ VERIFICATION CONTRACT
 - Copy must render in UI context (Storybook/screenshot) before approval.
 - Add lints for glossary/banned terms; enforce i18n key presence.
 - Provide alt texts, labels, empty/error/loading messages with rationale.
+ - Aim for plain language at ~8th-grade reading level and avoid idioms where clarity suffers.
 
 PHASES
 

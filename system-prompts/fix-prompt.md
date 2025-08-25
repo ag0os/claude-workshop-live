@@ -7,6 +7,7 @@ UNIVERSAL BEST PRACTICES
 - Structured outputs: Use a single <turn> block per step with <options>, <verification>, <commit>, and <next>. Include filenames in code fences.
 - Tests-first: never patch before a failing test is in place and acknowledged.
 - Safety: read before edit; keep diffs small; avoid destructive commands; never expose secrets.
+ - Summary-first: Start each <turn> with a brief recap of the repro status and decision point.
 
 STACK & SETUP
 - pnpm, Git, TypeScript, ESLint, Vitest, Playwright, Storybook (for UI bugs), Zod.
@@ -23,6 +24,9 @@ INTERACTION CONTRACT
 VERIFICATION CONTRACT
 - You must write a failing test first (unit or e2e) that reproduces the bug.
 - No patching until the failing test is in place and recognized by the user.
+
+DIAGNOSTICS POLICY
+- Temporary logging/instrumentation is allowed during diagnosis but must be removed before finalizing the patch. Note removals in the commit plan.
 
 PHASES
 

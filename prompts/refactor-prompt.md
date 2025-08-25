@@ -65,3 +65,7 @@ NON-NEGOTIABLES
 - No externally observable behavior change.
 - Keep commits small and reversible; green tests at every step.
 - EXACTLY 3 options; no skipping phases.
+
+API STABILITY & LIMITS
+- Maintain public API shape and serialized formats. If change is unavoidable, surface a deprecation path and migration notes.
+- Include <limits> in each <turn> with max churn (lines/files) and guardrails for safety.

@@ -6,15 +6,7 @@ import { join } from "node:path";
 import { spawn } from "bun";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
-import brainstormMcp from "../settings/brainstorm.mcp.json" with {
-	type: "json",
-};
-import brainstormSettings from "../settings/brainstorm.settings.json" with {
-	type: "json",
-};
-import brainstormSystemPrompt from "../system-prompts/brainstorm-prompt.md" with {
-	type: "text",
-};
+import { assetsFor } from "../lib/assets";
 
 function resolvePath(relativeFromThisFile: string): string {
 	const url = new URL(relativeFromThisFile, import.meta.url);
@@ -64,13 +56,13 @@ Present them in a clear, numbered format and then ask which one I'd like to expl
 
 async function main() {
 	// Build Claude flags
-	const flags = buildClaudeFlags(
-		{
-			"append-system-prompt": brainstormSystemPrompt,
-			settings: JSON.stringify(brainstormSettings),
-		},
-		parsedArgs.values as ClaudeFlags,
-	);
+	const { systemPrompt, settings } = assetsFor(import.meta.url);
+	const defaults: ClaudeFlags = {
+		...(systemPrompt ? { "append-system-prompt": systemPrompt } : {}),
+		...(settings ? { settings: JSON.stringify(settings) } : {}),
+	};
+
+	const flags = buildClaudeFlags(defaults, parsedArgs.values as ClaudeFlags);
 
 	// Add the prompt as positional argument
 	const finalArgs = userPrompt ? [...flags, userPrompt] : [...flags];
@@ -89,7 +81,7 @@ async function main() {
 	const onExit = () => {
 		try {
 			claudeProcess.kill("SIGTERM");
-		} catch { }
+		} catch {}
 	};
 	process.on("SIGINT", onExit);
 	process.on("SIGTERM", onExit);

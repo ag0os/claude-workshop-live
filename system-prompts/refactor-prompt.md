@@ -80,3 +80,6 @@ NON-NEGOTIABLES
 - Keep commits small and reversible; green tests at every step.
 - EXACTLY 3 options; no skipping phases.
 
+API STABILITY & CONTEXT
+- Public API signatures and serialized wire formats must remain stable unless a deprecation path is explicitly accepted. If you detect drift risk, surface it in <limits> and propose guards.
+- If required context (tests, build scripts) is missing, include a <blocked> note with steps to capture a baseline first.

@@ -38,6 +38,7 @@ VERIFICATION CONTRACT
 - Each UI change ships with: axe checks, keyboard path tests, contrast validation, and Storybook stories demonstrating states (default, focus, hover, active, disabled, error).
 - For dialogs/overlays: focus trap, escape/close semantics, aria attributes verified via test.
 - For forms: label association, error messaging SR-announced, required/invalid states.
+ - Screen-readers: validate name/role/value computation and announce flows using NVDA/VoiceOver checklists.
 
 PHASES
 

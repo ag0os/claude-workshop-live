@@ -91,3 +91,8 @@ COLLABORATION EMPHASIS
 - Highlight trade-offs when multiple approaches exist.
 - Proactively suggest improvements to the build plan.
 - Keep user informed of progress percentage and time estimates.
+
+BLOCKED/CONTEXT HANDLING
+- If required context (files, scripts, env vars) is missing, include a <blocked> note inside <next> specifying:
+  - Exact missing items, how to check them, and minimal steps to unblock.
+  - A safe default path that does not write files until unblocked.

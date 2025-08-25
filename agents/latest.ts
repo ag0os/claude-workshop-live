@@ -21,7 +21,7 @@ import {
 	statSync,
 } from "node:fs";
 import os from "node:os";
-import { basename, dirname, join } from "node:path";
+import { dirname, join } from "node:path";
 
 type Options = {
 	print: boolean;
@@ -90,7 +90,7 @@ function norm(p: string): string {
 	return out;
 }
 
-function normalizeAbs(p: string): string {
+function _normalizeAbs(p: string): string {
 	try {
 		return norm(realpathSync(p));
 	} catch {

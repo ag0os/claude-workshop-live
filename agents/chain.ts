@@ -57,7 +57,7 @@ async function runPlannerAndGetPlan(userPrompt: string): Promise<string> {
 	const args = [...flags, userPrompt];
 
 	const proc = spawn(["claude", ...args], {
-		stdin: "ignore",
+		stdin: "inherit",
 		stdout: "pipe",
 		stderr: "inherit",
 		env: {
@@ -94,7 +94,7 @@ async function runPlannerAndGetPlan(userPrompt: string): Promise<string> {
 }
 
 async function runContainWithPlan(planText: string): Promise<number> {
-    const initialPrompt = `\n<plan>\n${planText}\n</plan>\n\nFollow this plan step-by-step using only the container-use MCP tools. If the plan is incomplete, refine it minimally and proceed.`;
+	const initialPrompt = `\n<plan>\n${planText}\n</plan>\n\nFollow this plan step-by-step using only the container-use MCP tools. If the plan is incomplete, refine it minimally and proceed.`;
 
 	const baseFlags = {
 		settings: containSettingsJson,
@@ -106,26 +106,26 @@ async function runContainWithPlan(planText: string): Promise<number> {
 	);
 	const args = [...flags, initialPrompt];
 
-    const child = spawn(["claude", ...args], {
-        stdin: "inherit",
-        stdout: "inherit",
-        stderr: "inherit",
-        env: {
-            ...process.env,
-            CLAUDE_PROJECT_DIR: projectRoot,
-        },
-    });
+	const child = spawn(["claude", ...args], {
+		stdin: "inherit",
+		stdout: "inherit",
+		stderr: "inherit",
+		env: {
+			...process.env,
+			CLAUDE_PROJECT_DIR: projectRoot,
+		},
+	});
 
-    const onExit = () => {
-        try {
-            child.kill("SIGTERM");
-        } catch {}
-    };
-    process.on("SIGINT", onExit);
-    process.on("SIGTERM", onExit);
+	const onExit = () => {
+		try {
+			child.kill("SIGTERM");
+		} catch {}
+	};
+	process.on("SIGINT", onExit);
+	process.on("SIGTERM", onExit);
 
-    await child.exited;
-    return child.exitCode ?? 0;
+	await child.exited;
+	return child.exitCode ?? 0;
 }
 
 async function main() {

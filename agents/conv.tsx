@@ -26,7 +26,6 @@ import {
 } from "node:fs";
 import os from "node:os";
 import { basename, dirname, join } from "node:path";
-import { createInterface } from "node:readline";
 import { Box, render, Text, useApp, useInput } from "ink";
 import React from "react";
 
@@ -71,7 +70,7 @@ function dashedFromAbs(abs: string): string {
 }
 function mappedNames(abs: string): string[] {
 	const d = dashedFromAbs(abs);
-	return ["~" + d, d];
+	return [`~${d}`, d];
 }
 function findMappedDirFrom(startAbs: string, debug = false): string | null {
 	const root = projectsRoot();
@@ -159,17 +158,26 @@ function listJsonlFiles(dir: string): string[] {
 // ───────────────────────────────────────────────────────────────────────────────
 type TranscriptMessage = { role: string; text: string; timestamp?: string };
 
-function extractRoleAndText(obj: any): {
+function extractRoleAndText(obj: unknown): {
 	role: string | null;
 	text: string;
 	timestamp?: string;
 } {
-	const topType: string | undefined = obj?.type;
+	const rec =
+		typeof obj === "object" && obj !== null
+			? (obj as Record<string, unknown>)
+			: undefined;
+	const topType =
+		typeof rec?.type === "string" ? (rec.type as string) : undefined;
+	const maybeMessage = rec?.message as Record<string, unknown> | undefined;
 	const role: string | null =
-		(obj?.message?.role as string) ??
-		(typeof topType === "string" ? topType : null);
+		typeof maybeMessage?.role === "string"
+			? ((maybeMessage.role as string) ?? null)
+			: typeof topType === "string"
+				? topType
+				: null;
 	const parts: string[] = [];
-	function push(v: any) {
+	function push(v: unknown) {
 		if (v == null) return;
 		if (typeof v === "string") {
 			parts.push(v);
@@ -180,19 +188,23 @@ function extractRoleAndText(obj: any): {
 			return;
 		}
 		if (typeof v === "object") {
-			if (typeof v.text === "string") parts.push(v.text);
-			if (typeof v.content === "string") parts.push(v.content);
-			if (Array.isArray(v.content)) push(v.content);
+			const vr = v as Record<string, unknown>;
+			if (typeof vr.text === "string") parts.push(vr.text);
+			if (typeof vr.content === "string") parts.push(vr.content);
+			if (Array.isArray(vr.content)) push(vr.content);
 			for (const k of ["summary", "title", "message", "body"]) {
-				if (typeof (v as any)[k] === "string") parts.push((v as any)[k]);
+				if (typeof vr[k] === "string") parts.push(vr[k] as string);
 			}
 			return;
 		}
 	}
-	if (obj?.message?.content !== undefined) push(obj.message.content);
-	if (typeof obj?.summary === "string") parts.push(obj.summary);
+	const msg =
+		(rec?.message as Record<string, unknown> | undefined) ?? undefined;
+	if (msg && (msg as Record<string, unknown>).content !== undefined)
+		push((msg as Record<string, unknown>).content);
+	if (typeof rec?.summary === "string") parts.push(rec.summary as string);
 	const text = parts.join("\n");
-	const timestamp = obj?.timestamp;
+	const timestamp = rec?.timestamp as string | undefined;
 	return { role, text, timestamp };
 }
 
@@ -202,7 +214,7 @@ function parseJsonlMessages(jsonlPath: string): TranscriptMessage[] {
 	for (const line of data.split(/\r?\n/)) {
 		const trimmed = line.trim();
 		if (!trimmed) continue;
-		let obj: any;
+		let obj: unknown;
 		try {
 			obj = JSON.parse(trimmed);
 		} catch {
@@ -276,13 +288,15 @@ function deriveTitleFromMessages(messages: TranscriptMessage[]): string | null {
 	const firstUser = messages.find(
 		(m) => m.role === "user" && m.text.trim().length > 0,
 	);
-	const candidate =
-		firstUser?.text ||
-		messages.find((m) => m.text.trim().length > 0)?.text ||
+	const candidate: string | null =
+		firstUser?.text ??
+		messages.find((m) => m.text.trim().length > 0)?.text ??
 		null;
-	if (!candidate) return null;
-	let singleLine = candidate.split(/\r?\n/)[0].trim();
-	if (singleLine.length > 50) singleLine = singleLine.slice(0, 50) + "...";
+	if (typeof candidate !== "string") return null;
+	const firstLineCandidate = candidate as string;
+	const parts = firstLineCandidate.split(/\r?\n/);
+	let singleLine = (parts[0] ?? "").trim();
+	if (singleLine.length > 50) singleLine = `${singleLine.slice(0, 50)}...`;
 	return singleLine;
 }
 
@@ -346,9 +360,9 @@ function firstMatchSnippet(lines: string[], q: string): React.ReactNode | null {
 		try {
 			const obj = JSON.parse(s);
 			const { text } = extractRoleAndText(obj);
-			if (text && text.toLowerCase().includes(lq)) {
+			if (text?.toLowerCase().includes(lq)) {
 				const one = text.replace(/\s+/g, " ").trim();
-				const shortened = one.length > 140 ? one.slice(0, 137) + "..." : one;
+				const shortened = one.length > 140 ? `${one.slice(0, 137)}...` : one;
 				return highlightMatch(shortened, q);
 			}
 		} catch {}
@@ -359,43 +373,39 @@ function firstMatchSnippet(lines: string[], q: string): React.ReactNode | null {
 // Helper function to highlight matched text
 function highlightMatch(text: string, query: string): React.ReactNode {
 	if (!query) return text;
-	
+
 	const parts: React.ReactNode[] = [];
 	const lowerText = text.toLowerCase();
 	const lowerQuery = query.toLowerCase();
 	let lastIndex = 0;
 	let matchIndex = lowerText.indexOf(lowerQuery);
-	
+
 	while (matchIndex !== -1) {
 		// Add text before match
 		if (matchIndex > lastIndex) {
 			parts.push(
 				<Text key={`text-${lastIndex}`}>
 					{text.slice(lastIndex, matchIndex)}
-				</Text>
+				</Text>,
 			);
 		}
-		
+
 		// Add highlighted match
 		parts.push(
 			<Text key={`match-${matchIndex}`} color="yellow" bold>
 				{text.slice(matchIndex, matchIndex + query.length)}
-			</Text>
+			</Text>,
 		);
-		
+
 		lastIndex = matchIndex + query.length;
 		matchIndex = lowerText.indexOf(lowerQuery, lastIndex);
 	}
-	
+
 	// Add remaining text
 	if (lastIndex < text.length) {
-		parts.push(
-			<Text key={`text-${lastIndex}`}>
-				{text.slice(lastIndex)}
-			</Text>
-		);
+		parts.push(<Text key={`text-${lastIndex}`}>{text.slice(lastIndex)}</Text>);
 	}
-	
+
 	return <>{parts}</>;
 }
 
@@ -408,8 +418,8 @@ function countMatches(lines: string[], q: string, roles?: Set<string>): number {
 			const obj = JSON.parse(s);
 			const { role, text } = extractRoleAndText(obj);
 			const rn = (role || "").toLowerCase();
-			if (roles && roles.size && rn && !roles.has(rn)) continue;
-			if (text && text.toLowerCase().includes(lq)) c++;
+			if (roles?.size && rn && !roles.has(rn)) continue;
+			if (text?.toLowerCase().includes(lq)) c++;
 		} catch {}
 	}
 	return c;
@@ -430,7 +440,6 @@ function copyToClipboard(text: string): boolean {
 			execSync("xclip -selection clipboard", {
 				input: text,
 				stdio: ["pipe", "ignore", "ignore"],
-				shell: true,
 			});
 			return true;
 		} catch {}
@@ -438,7 +447,6 @@ function copyToClipboard(text: string): boolean {
 			execSync("wl-copy", {
 				input: text,
 				stdio: ["pipe", "ignore", "ignore"],
-				shell: true,
 			});
 			return true;
 		} catch {}
@@ -476,8 +484,7 @@ function combinedTranscriptText(
 	const transcripts: { path: string; messages: TranscriptMessage[] }[] = [];
 	for (const p of files) {
 		let msgs = parseJsonlMessages(p);
-		if (roles && roles.size)
-			msgs = msgs.filter((m) => !m.role || roles.has(m.role));
+		if (roles?.size) msgs = msgs.filter((m) => !m.role || roles.has(m.role));
 		transcripts.push({ path: p, messages: msgs });
 	}
 	const parts: string[] = [];
@@ -623,8 +630,8 @@ function runExport(argv: string[]) {
 	const transcripts: { path: string; messages: TranscriptMessage[] }[] = [];
 	for (const p of inputFiles) {
 		let msgs = parseJsonlMessages(p);
-		if (opts.roles && opts.roles.size)
-			msgs = msgs.filter((m) => !m.role || opts.roles!.has(m.role));
+		if (opts.roles?.size)
+			msgs = msgs.filter((m) => !m.role || opts.roles?.has(m.role));
 		transcripts.push({ path: p, messages: msgs });
 	}
 
@@ -804,7 +811,7 @@ function runPicker(opts: PickerOptions) {
 			}[];
 			r.sort((a, b) => b.count - a.count);
 			return r;
-		}, [q, rolesPreset, cache]);
+		}, [q, cache, opts.mode, roles]);
 
 		// Visible windows
 		const total = results.length;
@@ -860,7 +867,7 @@ function runPicker(opts: PickerOptions) {
 					return s;
 				});
 			}
-		}, [total]); // eslint-disable-line react-hooks/exhaustive-deps
+		}, [total, idx, opts.mode, phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
 		useInput((input, key) => {
 			if (key.escape) {
@@ -886,7 +893,8 @@ function runPicker(opts: PickerOptions) {
 					const i = order.indexOf(prev);
 					const dir = key.shift ? -1 : 1;
 					const next = (i + dir + order.length) % order.length;
-					return order[next];
+					const val = order.at(next) ?? "any";
+					return val;
 				});
 				return;
 			}
@@ -901,24 +909,27 @@ function runPicker(opts: PickerOptions) {
 					return;
 				}
 				if (key.return) {
-					const files = selected.size
+					const filesRaw: Array<string | undefined> = selected.size
 						? Array.from(selected)
-						: opts.mode === "latest" && opts.initialFiles?.length
-							? [opts.initialFiles[0]]
+						: opts.mode === "latest" && (opts.initialFiles?.length ?? 0) > 0
+							? [opts.initialFiles?.[0]]
 							: results[idx]
-								? [results[idx].path]
+								? [results[idx]?.path]
 								: [];
+					const files = filesRaw.filter(
+						(f): f is string => typeof f === "string",
+					);
 					if (!files.length) {
 						setPhase("browse");
 						return;
 					}
-					const chosen = ACTIONS[actionIdx].id;
+					const chosen = ACTIONS[actionIdx]?.id ?? "cancel";
 					const markdown = chosen.endsWith("-md");
 					const text = combinedTranscriptText(files, roles, markdown);
 					switch (chosen) {
 						case "stdout-md":
 						case "stdout-txt": {
-							process.stdout.write(text + "\n");
+							process.stdout.write(`${text}\n`);
 							exit();
 							return;
 						}
@@ -1017,7 +1028,7 @@ function runPicker(opts: PickerOptions) {
 			</Text>
 		);
 
-		let body: any = null;
+		let body: React.ReactElement | null = null;
 
 		if (phase === "actions") {
 			const WIN = Math.min(ACTIONS.length, 7);
@@ -1028,15 +1039,23 @@ function runPicker(opts: PickerOptions) {
 						<Text dimColor>
 							Selected:{" "}
 							{selected.size
-								? Array.from(selected).map(basename).join(", ")
-								: results[idx]?.path
-									? basename(results[idx].path)
-									: "none"}
+								? Array.from(selected)
+										.map((p) => basename(p))
+										.join(", ")
+								: (() => {
+										const p = results[idx]?.path;
+										return p ? basename(p) : "none";
+									})()}
 						</Text>
 					)}
-					{opts.mode === "latest" && opts.initialFiles?.length ? (
-						<Text dimColor>Selected: {basename(opts.initialFiles[0])}</Text>
-					) : null}
+					{opts.mode === "latest" && (opts.initialFiles?.length ?? 0) > 0
+						? (() => {
+								const first = opts.initialFiles?.[0];
+								return (
+									<Text dimColor>Selected: {first ? basename(first) : ""}</Text>
+								);
+							})()
+						: null}
 					<Box marginTop={1} flexDirection="column">
 						{actionVisible.map((o, i) => {
 							const abs = actionStart + i;
@@ -1060,16 +1079,17 @@ function runPicker(opts: PickerOptions) {
 							const abs = startIdx + i;
 							const isSel = abs === idx;
 							const marked = selected.has(r.path) ? "●" : "○";
-							const titleDisplay = r.title && q ? (
-								<>
-									{" — "}
-									{highlightMatch(r.title, q)}
-								</>
-							) : r.title ? (
-								` — ${r.title}`
-							) : (
-								""
-							);
+							const titleDisplay =
+								r.title && q ? (
+									<>
+										{" — "}
+										{highlightMatch(r.title, q)}
+									</>
+								) : r.title ? (
+									` — ${r.title}`
+								) : (
+									""
+								);
 							return (
 								<Box key={r.path} flexDirection="column">
 									<Text color={isSel ? "yellow" : undefined}>
@@ -1251,6 +1271,7 @@ function parseSearchArgs(argv: string[]): {
 	const nonFlag: string[] = [];
 	for (let i = 0; i < argv.length; i++) {
 		const a = argv[i];
+		if (!a) continue;
 		if (!a.startsWith("-")) {
 			nonFlag.push(a);
 			continue;
@@ -1289,7 +1310,7 @@ function parseSearchArgs(argv: string[]): {
 		else if (a === "-h" || a === "--help") opts.help = true;
 		// Deprecated flags handled gracefully
 		else if (["--live", "--select", "--paths-only", "--json"].includes(a)) {
-			opts.deprecatedFlags!.push(a);
+			opts.deprecatedFlags?.push(a);
 		} else {
 			console.error(`Unknown option for search: ${a}`);
 			process.exit(64);
@@ -1322,7 +1343,7 @@ function runSearch(argv: string[]) {
 		searchHelp();
 		return;
 	}
-	if (opts.deprecatedFlags && opts.deprecatedFlags.length) {
+	if (opts.deprecatedFlags?.length) {
 		console.error(
 			`(notice) Deprecated flags ignored: ${opts.deprecatedFlags.join(", ")} — interactive mode is now default.`,
 		);

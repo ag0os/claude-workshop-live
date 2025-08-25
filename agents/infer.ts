@@ -13,7 +13,7 @@ import { getClaudeProjectsPath } from "../lib/claude";
 import { readAllJsonlsAsText, readMostRecentJsonlAsText } from "../lib/jsonl";
 
 // Parse command line arguments
-const { values, positionals } = parseArgs({
+const { values } = parseArgs({
 	args: Bun.argv.slice(2),
 	options: {
 		mode: {
@@ -61,14 +61,16 @@ Examples:
 
 // Get API key from 1Password
 const apiKey = (
-    await $`op item get "GEMINI_API_KEY_FREE" --fields credential --reveal`
-        .quiet()
-        .text()
+	await $`op item get "GEMINI_API_KEY_FREE" --fields credential --reveal`
+		.quiet()
+		.text()
 ).trim();
 
 if (!apiKey) {
-    console.error("Failed to retrieve GEMINI_API_KEY from 1Password. Ensure 'op' is signed in and the item exists.");
-    process.exit(1);
+	console.error(
+		"Failed to retrieve GEMINI_API_KEY from 1Password. Ensure 'op' is signed in and the item exists.",
+	);
+	process.exit(1);
 }
 
 const ai = new GoogleGenAI({
@@ -192,9 +194,11 @@ if (values.debug) {
 	console.log(`[DEBUG] Mode: ${values.mode}`);
 	console.log(`[DEBUG] Conversation scope: ${values.conversation}`);
 	if (values.conversation === "all") {
-		console.log(
-			`[DEBUG] Processing ${result.files?.length || 0} conversation files`,
-		);
+		const filesCount =
+			result && typeof result === "object" && "files" in result
+				? (result as { files: unknown[] }).files.length
+				: 0;
+		console.log(`[DEBUG] Processing ${filesCount} conversation files`);
 	}
 	encoder.free();
 }

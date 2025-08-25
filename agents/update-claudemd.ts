@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
 
-import { spawn } from "bun";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { ClaudeFlags } from "../lib/claude-flags.types";
+import { spawn } from "bun";
 import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 import updateClaudeMdMcp from "../settings/update-claudemd.mcp.json" with {
 	type: "json",
@@ -68,10 +67,10 @@ const finalPrompt = specificRequest
 
 async function main() {
 	// Build Claude flags
-	const flags: ClaudeFlags = buildClaudeFlags({
+	const flags = buildClaudeFlags({
 		...parsedArgs,
-		settings: updateClaudeMdSettings,
-		"mcp-config": [updateClaudeMdMcp],
+		settings: JSON.stringify(updateClaudeMdSettings),
+		"mcp-config": JSON.stringify([updateClaudeMdMcp]),
 		"append-system-prompt": updateClaudeMdSystemPrompt,
 	});
 

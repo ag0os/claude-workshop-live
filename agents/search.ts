@@ -18,7 +18,13 @@
  *   -h, --help           Show help
  */
 
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import {
+	existsSync,
+	readdirSync,
+	readFileSync,
+	realpathSync,
+	statSync,
+} from "node:fs";
 import os from "node:os";
 import { basename, dirname, join } from "node:path";
 
@@ -62,9 +68,10 @@ function parseArgs(argv: string[]): { opts: Options; query: string | null } {
 	let query: string | null = null;
 	for (let i = 0; i < argv.length; i++) {
 		const a = argv[i];
+		if (!a) continue;
 		if (!a.startsWith("-")) {
 			if (query === null) query = a;
-			else query += " " + a; // allow multi-word queries without quotes
+			else query += ` ${a}`; // allow multi-word queries without quotes
 			continue;
 		}
 		if (a === "-r" || a === "--role") {
@@ -127,7 +134,7 @@ function candidateStartPaths(cwd?: string): string[] {
 	arr.push(process.cwd());
 	const more = arr.map((p) => {
 		try {
-			return norm(Bun.file(p).path);
+			return norm(realpathSync(p));
 		} catch {
 			return p;
 		}
@@ -142,7 +149,7 @@ function dashedFromAbs(abs: string): string {
 
 function mappedNames(abs: string): string[] {
 	const d = dashedFromAbs(abs);
-	return ["~" + d, d];
+	return [`~${d}`, d];
 }
 
 function findMappedDirFrom(startAbs: string, debug = false): string | null {
@@ -206,18 +213,27 @@ function listJsonlFiles(dir: string): string[] {
 		.map((f) => join(dir, f));
 }
 
-function extractRoleAndText(obj: any): {
+function extractRoleAndText(obj: unknown): {
 	role: string | null;
 	text: string;
 	timestamp?: string;
 } {
-	const topType: string | undefined = obj?.type;
+	const rec =
+		typeof obj === "object" && obj !== null
+			? (obj as Record<string, unknown>)
+			: undefined;
+	const topType =
+		typeof rec?.type === "string" ? (rec.type as string) : undefined;
+	const maybeMessage = rec?.message as Record<string, unknown> | undefined;
 	const role: string | null =
-		(obj?.message?.role as string) ??
-		(typeof topType === "string" ? topType : null);
+		typeof maybeMessage?.role === "string"
+			? ((maybeMessage.role as string) ?? null)
+			: typeof topType === "string"
+				? topType
+				: null;
 
 	const parts: string[] = [];
-	function push(v: any) {
+	function push(v: unknown) {
 		if (v == null) return;
 		if (typeof v === "string") {
 			parts.push(v);
@@ -228,23 +244,27 @@ function extractRoleAndText(obj: any): {
 			return;
 		}
 		if (typeof v === "object") {
-			if (typeof v.text === "string") parts.push(v.text);
-			if (typeof v.content === "string") parts.push(v.content);
+			const vr = v as Record<string, unknown>;
+			if (typeof vr.text === "string") parts.push(vr.text);
+			if (typeof vr.content === "string") parts.push(vr.content);
 			// Some blocks nest their content as arrays
-			if (Array.isArray(v.content)) push(v.content);
+			if (Array.isArray(vr.content)) push(vr.content);
 			// Fallthrough: scan common keys
 			for (const k of ["summary", "title", "message", "body"]) {
-				if (typeof (v as any)[k] === "string") parts.push((v as any)[k]);
+				if (typeof vr[k] === "string") parts.push(vr[k] as string);
 			}
 			return;
 		}
 	}
 	// Prefer message.content; fallbacks include summary (for summary lines)
-	if (obj?.message?.content !== undefined) push(obj.message.content);
-	if (typeof obj?.summary === "string") parts.push(obj.summary);
+	const msg =
+		(rec?.message as Record<string, unknown> | undefined) ?? undefined;
+	if (msg && (msg as Record<string, unknown>).content !== undefined)
+		push((msg as Record<string, unknown>).content);
+	if (typeof rec?.summary === "string") parts.push(rec.summary as string);
 
 	const text = parts.join("\n");
-	const timestamp = obj?.timestamp;
+	const timestamp = rec?.timestamp as string | undefined;
 	return { role, text, timestamp };
 }
 
@@ -283,15 +303,22 @@ function main() {
 
 	const q = query.toLowerCase();
 	let printed = 0;
-	const resultsJson: any[] = [];
+	type SearchResult = {
+		file: string;
+		line: number;
+		role: string | null;
+		timestamp?: string;
+		text: string;
+	};
+	const resultsJson: SearchResult[] = [];
 
 	for (const file of files) {
 		const data = readFileSync(file, "utf8");
 		const lines = data.split(/\r?\n/);
 		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i];
+			const line = lines[i] ?? "";
 			if (!line.trim()) continue;
-			let obj: any;
+			let obj: unknown;
 			try {
 				obj = JSON.parse(line);
 			} catch {
@@ -313,7 +340,7 @@ function main() {
 			} else {
 				const ts = timestamp ? ` [${timestamp}]` : "";
 				const who = roleNorm || "unknown";
-				const snippet = text.length > 300 ? text.slice(0, 297) + "..." : text;
+				const snippet = text.length > 300 ? `${text.slice(0, 297)}...` : text;
 				console.log(`${basename(file)}:${i + 1}:${who}${ts}: ${snippet}`);
 			}
 

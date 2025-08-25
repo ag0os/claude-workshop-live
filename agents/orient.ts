@@ -20,7 +20,6 @@ import { parseArgs } from "node:util";
 import { spawn } from "bun";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
-import orientMcp from "../settings/orient.mcp.json" with { type: "json" };
 import orientSettings from "../settings/orient.settings.json" with {
 	type: "json",
 };
@@ -171,7 +170,7 @@ async function main() {
 	const onExit = () => {
 		try {
 			child.kill("SIGTERM");
-		} catch { }
+		} catch {}
 	};
 
 	process.on("SIGINT", onExit);

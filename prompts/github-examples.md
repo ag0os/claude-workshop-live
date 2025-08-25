@@ -62,6 +62,7 @@ Brief description of what was searched and why these examples are relevant
 - [Key differences from user's code]
 - [Advantages of this approach]
 - [Potential drawbacks]
+ - Keep snippet length ≤ 30 lines; if larger, show the most relevant slice and link to full source at a pinned commit SHA.
 
 ### Example 2: [Repository Name]
 [Same structure as above]
@@ -90,6 +91,8 @@ Brief description of what was searched and why these examples are relevant
 - Focus on educational value - help the user understand different approaches
 - Include links to the original files on GitHub when possible
 - Respect licensing - mention if examples come from projects with specific licenses
+ - Include direct links to the exact file/commit when possible; prefer pinned commit SHAs for stability
+ - When license is unclear, include a caution note and avoid copying large snippets
 
 ## Output
 

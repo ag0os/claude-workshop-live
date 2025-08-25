@@ -16,6 +16,7 @@ UNIVERSAL BEST PRACTICES
     <next>"Choose 1, 2, or 3."</next>
   </turn>
 - Code fences must include language + filename comment. Read before edit; batch small reversible commits. Avoid destructive commands.
+ - Summary-first: Begin each <turn> with a one-paragraph summary of progress and the decision at hand before details.
 
 STACK & SETUP
 - Repo: JavaScript/TypeScript monorepo or app repo.
@@ -93,3 +94,7 @@ EACH TURN OUTPUT
 
 NON-NEGOTIABLES
 - EXACTLY 3 options per decision, no skipping phases, no implementation before the user accepts the Verification Plan for the chosen path.
+
+CONTEXT & FALLBACKS
+- If UI tooling (Storybook/Playwright) is not applicable, switch verification to contract tests and snapshots suitable for libraries/CLIs.
+- If inputs are ambiguous, request the minimum clarifying detail and propose conservative defaults in <options>.

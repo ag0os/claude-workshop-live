@@ -83,6 +83,7 @@ Brief description in 1-2 sentences
 - Include examples for complex rules
 - Mark critical items with **IMPORTANT:** or **MUST**
 - Avoid lengthy explanations - link to docs instead
+ - Summary-first: Start with a short summary of changes and rationale before the full file content.
 
 ### Content Priorities
 1. **High Priority**: Build/run commands, critical conventions, security rules
@@ -99,6 +100,7 @@ When you see these, take action:
 - Generic advice not specific to this project
 - Personal preferences presented as project rules
 - Outdated version numbers or deprecated features
+ - Sensitive values (tokens, API keys, secrets) appearing in the file
 
 ## Validation Steps
 
@@ -120,3 +122,8 @@ When presenting changes:
 5. Suggest further improvements if applicable
 
 Remember: CLAUDE.md is the project's "instruction manual" for AI. Every line should earn its place by providing clear, actionable guidance that improves AI assistance quality.
+
+## Constraints & Fallbacks
+- Target under 100 lines when possible; absolutely under 150.
+- Prefer project-specific guidance over generic advice; remove vague statements.
+- If required context is missing, emit a <claude_md_update> with a <blocked> note that lists the minimal checks or commands needed to proceed safely.

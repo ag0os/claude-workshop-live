@@ -18,8 +18,8 @@
 import { parseArgs } from "node:util";
 import { spawn } from "bun";
 import { Box, render, Text } from "ink";
-import React, { useEffect, useState } from "react";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
+import { useEffect, useState } from "react";
+import { buildClaudeFlags, parsedArgs } from "../lib/flags";
 
 // Parse our agent-specific arguments, ignoring claude-specific ones
 const args = parseArgs({
@@ -345,7 +345,7 @@ async function runClaudeCommand(prompt: string): Promise<string> {
 	);
 
 	const proc = spawn(["claude", ...flags, prompt], {
-		stdin: "ignore",
+		stdin: "inherit",
 		stdout: "pipe",
 		stderr: "inherit",
 	});
@@ -435,6 +435,9 @@ const JsonlFormatterApp = () => {
 	const [error, setError] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
 
+	// Resolve selected recipe (if any) once; used in render below
+	const selectedRecipe = recipes[formatOption as string];
+
 	useEffect(() => {
 		if (help) return;
 
@@ -514,9 +517,9 @@ const JsonlFormatterApp = () => {
 								/>
 							))}
 						</Box>
-					) : recipes[formatOption as string] ? (
+					) : selectedRecipe ? (
 						<RecipeOutput
-							recipe={recipes[formatOption as string]!}
+							recipe={selectedRecipe}
 							number={formatOption as string}
 							jsonlData={jsonlData}
 						/>

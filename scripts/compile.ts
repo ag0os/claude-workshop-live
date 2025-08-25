@@ -11,4 +11,8 @@ if (!input) {
 const outputName = basename(input, ".ts");
 const outputPath = `./bin/${outputName}`;
 
+// Generate static asset maps so Bun can inline all assets
+await $`bun scripts/gen-assets.ts`;
+
+// Build a single-file binary
 await $`bun build --compile ${input} --outfile ${outputPath}`;

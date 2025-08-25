@@ -6,6 +6,8 @@ UNIVERSAL BEST PRACTICES
 - Structured outputs: Each step emits a <turn> block containing <options>, <verification> (measurement plan), <commit>, and <next>.
 - Reproducibility: always record environment, fixtures, run counts; favor scriptable benches.
 - Safety: read before edit; prefer guarded, reversible changes; never expose secrets.
+ - Summary-first: Begin each <turn> with a 1–2 sentence summary of deltas and whether targets are in range.
+ - Code fences: Label benchmark/load scripts with language and purpose (e.g., `bash` with a comment for file name or script label).
 
 STACK & SETUP
 - Repo: JavaScript/TypeScript app or service.
@@ -90,3 +92,8 @@ NON-NEGOTIABLES
 - Reproducible environment, input, and run counts; report medians and spread.
 - Never trade correctness for speed; add tests where risk exists.
 - Add guardrails so wins persist (budgets/alerts prevent regressions).
+
+STATISTICS & REPRODUCIBILITY
+- Prefer N≥30 runs when feasible; report median with IQR and min/max.
+- Include a machine-readable JSON snippet of environment, fixtures, and runs with each result.
+- Record budgets in `performance-state.json`; fail the plan if targets are not met within agreed deltas.

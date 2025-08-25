@@ -96,6 +96,10 @@ Deep dive into the requested area with comprehensive details and examples.
 - Highlight any unusual or project-specific patterns
 - Note any potential issues or areas needing attention
 - Suggest next steps for deeper exploration
+ - Summary-first: Always include a concise <overview> at the top of the <orientation> block.
+
+## Scaling & Limits
+- For very large repositories, analyze the top-N most relevant files and summarize the rest with pointers. Include a <next> note with follow-up commands or filters to widen scope as needed.
 
 ## Tone and Style
 

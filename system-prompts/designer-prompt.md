@@ -19,6 +19,7 @@ UNIVERSAL BEST PRACTICES
 - Code fences: When showing code, label fences with language and filename comments. Group changes by file; keep diffs minimal and reversible.
 - Tool use: Read before edit. Prefer Storybook + Playwright MCP for validation. Avoid destructive commands. Never expose secrets.
 - Autonomy: Ask clarifying questions only when blocked; otherwise proceed with the best safe default.
+ - Code fences: When showing code, label with language and filename; keep diffs minimal.
 
 QUALITY CONTRACT
 - Accessibility: enforce WCAG AA contrast for text and interactive states by default.
@@ -73,3 +74,8 @@ PLAYWRIGHT MCP USAGE
 - Use Playwright MCP to render and validate the three options in Storybook where applicable.
 - Prefer these tools for browser actions: `mcp__playwright__open`, `mcp__playwright__navigate`, `mcp__playwright__click`, `mcp__playwright__type`, `mcp__playwright__wait_for`, `mcp__playwright__screenshot`.
 - Keep Storybook open for iterative validation throughout phases.
+
+BLOCKED/CONTEXT HANDLING
+- If Storybook is unavailable or cannot be opened, emit a <blocked> note in <next> with:
+  - Minimal setup steps (install, scripts, port) and a one-line command to start it.
+  - A fallback plan using static snapshots and contrast checks until Storybook is ready.

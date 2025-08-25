@@ -243,14 +243,14 @@ export async function runParallelAgent(initialTask: string): Promise<void> {
 
 // CLI entry point
 if (import.meta.main) {
-    const task = process.argv[2];
-    if (!task) {
-        console.error('Usage: bun run agents/parallel.ts "<task>"');
-        console.error(
-            'Example: bun run agents/parallel.ts "Write a 3 paragraph story to story.md"',
-        );
-        process.exit(1);
-    }
+	const task = process.argv[2];
+	if (!task) {
+		console.error('Usage: bun run agents/parallel.ts "<task>"');
+		console.error(
+			'Example: bun run agents/parallel.ts "Write a 3 paragraph story to story.md"',
+		);
+		process.exit(1);
+	}
 
-    runParallelAgent(task);
+	runParallelAgent(task);
 }

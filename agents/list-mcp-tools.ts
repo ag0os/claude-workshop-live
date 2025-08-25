@@ -72,13 +72,16 @@ async function fetchMCPToolsDirectly(url: string, authToken?: string) {
 		throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 	}
 
-	const data = await response.json();
+	const data = (await response.json()) as {
+		result?: ToolsResponse;
+		error?: { message?: string };
+	};
 
 	if (data.error) {
-		throw new Error(`MCP Error: ${data.error.message}`);
+		throw new Error(`MCP Error: ${data.error.message ?? "Unknown error"}`);
 	}
 
-	return data.result as ToolsResponse;
+	return (data.result ?? { tools: [] }) as ToolsResponse;
 }
 
 let response: ToolsResponse;

@@ -7,9 +7,13 @@ import { readdir, unlink } from "fs/promises";
 
 const agentsDir = join(process.cwd(), "agents");
 const promptsDir = join(process.cwd(), "prompts");
+const systemPromptsDir = join(process.cwd(), "system-prompts");
+const settingsDir = join(process.cwd(), "settings");
 const binDir = join(process.cwd(), "bin");
 
-console.log(`Watching ${agentsDir} and ${promptsDir} for changes...`);
+console.log(
+  `Watching agents, prompts, system-prompts, settings for changes...`,
+);
 console.log("Will rebuild ALL agents on any change in these directories");
 
 // Track existing agent files
@@ -31,6 +35,15 @@ async function compileAllAgents() {
   console.log("Rebuilding all agents...");
 
   try {
+    // Always regenerate asset maps first so builds inline latest files
+    try {
+      console.log("  Generating asset maps...");
+      await $`bun scripts/gen-assets.ts`;
+      console.log("  ✓ Asset maps generated");
+    } catch (error) {
+      console.error("  ✗ Failed to generate asset maps:", error);
+    }
+
     const currentAgents = await getCurrentAgents();
 
     // Check for deleted agents
@@ -45,7 +58,11 @@ async function compileAllAgents() {
           console.log(`  ✓ Removed ${agentName} from bin directory`);
         } catch (error) {
           // File might already be gone or never existed
-          console.log(`  ℹ Could not remove ${agentName} from bin directory:`, error.message);
+          if (error instanceof Error) {
+            console.log(`  ℹ Could not remove ${agentName} from bin directory:`, error.message);
+          } else {
+            console.log(`  ℹ Could not remove ${agentName} from bin directory:`, error);
+          }
         }
       }
     }
@@ -103,17 +120,43 @@ const agentsWatcher = watch(agentsDir, { recursive: true }, (event, filename) =>
   }
 });
 
-const promptsWatcher = watch(promptsDir, { recursive: true }, (event, filename) => {
-  if (filename && filename.endsWith('.md')) {
-    debouncedRebuild('prompts', filename);
-  }
-});
+const promptsWatcher = watch(
+  promptsDir,
+  { recursive: true },
+  (event, filename) => {
+    if (filename && filename.endsWith('.md')) {
+      debouncedRebuild('prompts', filename);
+    }
+  },
+);
+
+const systemPromptsWatcher = watch(
+  systemPromptsDir,
+  { recursive: true },
+  (event, filename) => {
+    if (filename && filename.endsWith('.md')) {
+      debouncedRebuild('system-prompts', filename);
+    }
+  },
+);
+
+const settingsWatcher = watch(
+  settingsDir,
+  { recursive: true },
+  (event, filename) => {
+    if (filename && (filename.endsWith('.json'))) {
+      debouncedRebuild('settings', filename);
+    }
+  },
+);
 
 // Handle process termination
 process.on("SIGINT", () => {
   console.log("\nStopping watchers...");
   agentsWatcher.close();
   promptsWatcher.close();
+  systemPromptsWatcher.close();
+  settingsWatcher.close();
   process.exit(0);
 });
 
