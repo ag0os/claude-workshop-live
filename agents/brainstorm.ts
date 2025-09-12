@@ -81,7 +81,7 @@ async function main() {
 	const onExit = () => {
 		try {
 			claudeProcess.kill("SIGTERM");
-		} catch {}
+		} catch { }
 	};
 	process.on("SIGINT", onExit);
 	process.on("SIGTERM", onExit);

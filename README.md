@@ -141,6 +141,18 @@ Each agent is a specialized Claude instance with custom configurations:
 - **orient** - Generates a comprehensive orientation map (markdown) for a concept, feature, or file
 - **brainstorm** - Generate 5 AI agent variations from your idea and select one to develop
 - **update-claudemd** - Maintain and update CLAUDE.md files following best practices
+- **diagram-all** - Project-wide, exhaustive event flow diagram generator
+- **diagram-topic** - Generate diagrams limited to a single topic
+- **diagram-consolidate** - Verify, deduplicate, and bundle diagrams by topic
+
+## Diagram Agents
+
+- Run project-wide diagrams:
+  - `bun run agents/diagram-all.ts [optional focus words]`
+- Run topic-focused diagrams:
+  - `bun run agents/diagram-topic.ts <topic> [extra focus]`
+- Consolidate existing diagrams:
+  - `bun run agents/diagram-consolidate.ts [optional filters]`
 
 ## Development Commands
 

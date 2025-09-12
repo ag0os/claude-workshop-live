@@ -1,0 +1,81 @@
+{
+  "name": "diagram-topic",
+  "description": "Topic-focused event flow diagram generator",
+  "version": "1.0.0",
+  "capabilities": {
+    "tools": {
+      "enabled": [
+        "Read",
+        "Write",
+        "Glob",
+        "Grep",
+        "LS",
+        "TodoWrite"
+      ],
+      "disabled": [
+        "Bash",
+        "Edit",
+        "MultiEdit",
+        "NotebookEdit",
+        "WebFetch",
+        "WebSearch"
+      ]
+    },
+    "output": {
+      "format": "markdown",
+      "diagrams": "mermaid",
+      "directory": "ai/diagrams"
+    }
+  },
+  "analysis": {
+    "patterns": [
+      "event-handlers",
+      "api-endpoints",
+      "state-management",
+      "database-queries",
+      "file-operations",
+      "websocket-events",
+      "message-queues",
+      "background-jobs",
+      "authentication-flows",
+      "error-handling"
+    ],
+    "depth": "focused",
+    "includeTests": false,
+    "includeNodeModules": false
+  },
+  "output_preferences": {
+    "diagramStyle": "flowchart",
+    "includeTimestamps": true,
+    "includeFileReferences": true,
+    "groupByCategory": true
+  },
+  "search": {
+    "fileExtensions": [
+      ".ts",
+      ".tsx",
+      ".js",
+      ".jsx",
+      ".vue",
+      ".svelte",
+      ".py",
+      ".go",
+      ".java",
+      ".cs",
+      ".rb",
+      ".php"
+    ],
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.git/**",
+      "**/coverage/**",
+      "**/tmp/**",
+      "**/temp/**",
+      "**/*.min.js",
+      "**/*.test.*",
+      "**/*.spec.*"
+    ]
+  }
+}

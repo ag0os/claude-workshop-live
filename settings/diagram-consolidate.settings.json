@@ -1,0 +1,48 @@
+{
+  "name": "diagram-consolidate",
+  "description": "Consolidate, verify, and deduplicate generated diagrams",
+  "version": "1.0.0",
+  "capabilities": {
+    "tools": {
+      "enabled": [
+        "Read",
+        "Write",
+        "Glob",
+        "Grep",
+        "LS",
+        "TodoWrite"
+      ],
+      "disabled": [
+        "Bash",
+        "Edit",
+        "MultiEdit",
+        "NotebookEdit",
+        "WebFetch",
+        "WebSearch"
+      ]
+    },
+    "output": {
+      "format": "markdown",
+      "diagrams": "mermaid",
+      "directory": "ai/diagrams"
+    }
+  },
+  "analysis": {
+    "patterns": [
+      "diagrams",
+      "mermaid",
+      "topic-grouping",
+      "deduplication",
+      "verification"
+    ],
+    "depth": "consolidation",
+    "includeTests": false,
+    "includeNodeModules": false
+  },
+  "output_preferences": {
+    "diagramStyle": "flowchart",
+    "includeTimestamps": false,
+    "includeFileReferences": false,
+    "groupByCategory": true
+  }
+}

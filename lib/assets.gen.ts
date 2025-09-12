@@ -5,13 +5,19 @@ import SP_update_claudemd from '../system-prompts/update-claudemd-prompt.md' wit
 import SP_refactor from '../system-prompts/refactor-prompt.md' with { type: 'text' }
 import SP_orient from '../system-prompts/orient-prompt.md' with { type: 'text' }
 import SP_designer from '../system-prompts/designer-prompt.md' with { type: 'text' }
+import SP_diagram_topic from '../system-prompts/diagram-topic-prompt.md' with { type: 'text' }
+import SP_design_audit from '../system-prompts/design-audit-prompt.md' with { type: 'text' }
 import SP_brainstorm from '../system-prompts/brainstorm-prompt.md' with { type: 'text' }
 import SP_builder from '../system-prompts/builder-prompt.md' with { type: 'text' }
+import SP_diagram_consolidate from '../system-prompts/diagram-consolidate-prompt.md' with { type: 'text' }
 import SP_prompt_improver from '../system-prompts/prompt-improver-prompt.md' with { type: 'text' }
+import SP_diagram_all from '../system-prompts/diagram-all-prompt.md' with { type: 'text' }
 import SP_fix from '../system-prompts/fix-prompt.md' with { type: 'text' }
 import SP_feature from '../system-prompts/feature-prompt.md' with { type: 'text' }
+import PR_expectations from '../prompts/expectations.md' with { type: 'text' }
 import PR_refactor_prompt from '../prompts/refactor-prompt.md' with { type: 'text' }
 import PR_claude_mix from '../prompts/claude-mix.md' with { type: 'text' }
+import PR_script_kit_gen from '../prompts/script-kit-gen.md' with { type: 'text' }
 import PR_cc from '../prompts/cc.md' with { type: 'text' }
 import PR_github_examples from '../prompts/github-examples.md' with { type: 'text' }
 import ST_contain from '../settings/contain.settings.json' with { type: 'json' }
@@ -20,8 +26,12 @@ import ST_orient from '../settings/orient.settings.json' with { type: 'json' }
 import ST_update_claudemd from '../settings/update-claudemd.settings.json' with { type: 'json' }
 import ST_builder from '../settings/builder.settings.json' with { type: 'json' }
 import ST_brainstorm from '../settings/brainstorm.settings.json' with { type: 'json' }
+import ST_diagram_all from '../settings/diagram-all.settings.json' with { type: 'json' }
+import ST_diagram_topic from '../settings/diagram-topic.settings.json' with { type: 'json' }
+import ST_design_audit from '../settings/design-audit.settings.json' with { type: 'json' }
 import ST_planner from '../settings/planner.settings.json' with { type: 'json' }
 import ST_designer from '../settings/designer.settings.json' with { type: 'json' }
+import ST_diagram_consolidate from '../settings/diagram-consolidate.settings.json' with { type: 'json' }
 import MCP_brainstorm from '../settings/brainstorm.mcp.json' with { type: 'json' }
 import MCP_designer from '../settings/designer.mcp.json' with { type: 'json' }
 import MCP_orient from '../settings/orient.mcp.json' with { type: 'json' }
@@ -34,7 +44,11 @@ import MCP_update_claudemd from '../settings/update-claudemd.mcp.json' with { ty
 export const SYSTEM_PROMPTS = {
   'brainstorm': SP_brainstorm,
   'builder': SP_builder,
+  'design-audit': SP_design_audit,
   'designer': SP_designer,
+  'diagram-all': SP_diagram_all,
+  'diagram-consolidate': SP_diagram_consolidate,
+  'diagram-topic': SP_diagram_topic,
   'feature': SP_feature,
   'fix': SP_fix,
   'orient': SP_orient,
@@ -45,14 +59,20 @@ export const SYSTEM_PROMPTS = {
 export const PROMPTS = {
   'cc': PR_cc,
   'claude-mix': PR_claude_mix,
+  'expectations': PR_expectations,
   'github-examples': PR_github_examples,
-  'refactor-prompt': PR_refactor_prompt
+  'refactor-prompt': PR_refactor_prompt,
+  'script-kit-gen': PR_script_kit_gen
 };
 export const SETTINGS = {
   'brainstorm': ST_brainstorm,
   'builder': ST_builder,
   'contain': ST_contain,
+  'design-audit': ST_design_audit,
   'designer': ST_designer,
+  'diagram-all': ST_diagram_all,
+  'diagram-consolidate': ST_diagram_consolidate,
+  'diagram-topic': ST_diagram_topic,
   'orient': ST_orient,
   'planner': ST_planner,
   'refactor': ST_refactor,

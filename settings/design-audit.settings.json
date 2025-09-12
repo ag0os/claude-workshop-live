@@ -1,0 +1,78 @@
+{
+  "name": "design-audit",
+  "description": "Comprehensive audit of design tokens, themes, layouts, utilities, components, and related tooling.",
+  "version": "1.0.0",
+  "capabilities": {
+    "tools": {
+      "enabled": [
+        "Read",
+        "Write",
+        "Glob",
+        "Grep",
+        "LS",
+        "TodoWrite"
+      ],
+      "disabled": [
+        "Bash",
+        "Edit",
+        "MultiEdit",
+        "NotebookEdit",
+        "WebFetch",
+        "WebSearch"
+      ]
+    },
+    "output": {
+      "format": "markdown",
+      "directory": "ai/design-audit"
+    }
+  },
+  "analysis": {
+    "patterns": [
+      "design-tokens",
+      "css-variables",
+      "themes",
+      "layout-breakpoints",
+      "tailwind-config",
+      "scss-less-variables",
+      "css-in-js",
+      "component-libraries",
+      "icons-typography",
+      "a11y",
+      "storybook-docs",
+      "postcss-stylelint-prettier",
+      "build-pipeline"
+    ],
+    "depth": "exhaustive",
+    "includeTests": true,
+    "includeNodeModules": false
+  },
+  "output_preferences": {
+    "includeFileReferences": true,
+    "includeTimestamps": true,
+    "groupByCategory": true,
+    "snippetMaxLines": 20
+  },
+  "search": {
+    "fileExtensions": [
+      ".ts", ".tsx", ".js", ".jsx",
+      ".mjs", ".cjs",
+      ".css", ".scss", ".sass", ".less",
+      ".json", ".mdx", ".md",
+      ".vue", ".svelte"
+    ],
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/.vercel/**",
+      "**/.output/**",
+      "**/.git/**",
+      "**/coverage/**",
+      "**/tmp/**",
+      "**/temp/**",
+      "**/*.min.*"
+    ]
+  }
+}
+
