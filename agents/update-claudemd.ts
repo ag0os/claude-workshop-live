@@ -3,7 +3,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "bun";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
+import { buildClaudeFlags, getPositionals } from "../lib/flags";
 import updateClaudeMdMcp from "../settings/update-claudemd.mcp.json" with {
 	type: "json",
 };
@@ -68,7 +68,6 @@ const finalPrompt = specificRequest
 async function main() {
 	// Build Claude flags
 	const flags = buildClaudeFlags({
-		...parsedArgs,
 		settings: JSON.stringify(updateClaudeMdSettings),
 		"mcp-config": JSON.stringify([updateClaudeMdMcp]),
 		"append-system-prompt": updateClaudeMdSystemPrompt,

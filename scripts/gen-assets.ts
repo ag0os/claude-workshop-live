@@ -19,7 +19,7 @@ function toVar(prefix: string, key: string) {
 
 function baseFrom(filename: string, pattern: RegExp): string | null {
   const m = filename.match(pattern);
-  return m ? m[1] : null;
+  return m?.[1] ?? null;
 }
 
 async function main() {

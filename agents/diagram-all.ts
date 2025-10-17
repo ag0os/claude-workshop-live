@@ -3,16 +3,16 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "bun";
-import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { assetsFor } from "../lib/assets";
+import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 
 function resolvePath(relativeFromThisFile: string): string {
-  const url = new URL(relativeFromThisFile, import.meta.url);
-  return url.pathname;
+	const url = new URL(relativeFromThisFile, import.meta.url);
+	return url.pathname;
 }
 
-const projectRoot = resolvePath("../");
+const _projectRoot = resolvePath("../");
 
 // Get the current working directory (the project to analyze)
 const targetProject = process.cwd();
@@ -20,10 +20,10 @@ const diagramsDir = join(targetProject, "ai", "diagrams");
 
 // Ensure the ai/diagrams directory exists
 try {
-  mkdirSync(diagramsDir, { recursive: true });
-  console.log(`✅ Created/verified directory: ${diagramsDir}`);
+	mkdirSync(diagramsDir, { recursive: true });
+	console.log(`✅ Created/verified directory: ${diagramsDir}`);
 } catch (error) {
-  console.error(`Failed to create diagrams directory: ${error}`);
+	console.error(`Failed to create diagrams directory: ${error}`);
 }
 
 // Optional free-form focus filter from args
@@ -77,46 +77,45 @@ ${focusArea ? `\nFocus Area (optional filter): ${focusArea}` : "\nAnalyze ALL fl
 Start by scanning the project structure to understand the architecture, then systematically identify and document every event flow.`;
 
 async function main() {
-  console.log("🔍 Starting project-wide diagram generation...");
-  console.log(`📁 Target project: ${targetProject}`);
-  console.log(`📊 Diagrams will be saved to: ${diagramsDir}`);
+	console.log("🔍 Starting project-wide diagram generation...");
+	console.log(`📁 Target project: ${targetProject}`);
+	console.log(`📊 Diagrams will be saved to: ${diagramsDir}`);
 
-  // Load assets by convention based on filename
-  const { systemPrompt, settings } = assetsFor(import.meta.url);
-  const defaults: ClaudeFlags = {
-    ...(systemPrompt ? { "append-system-prompt": systemPrompt } : {}),
-    ...(settings ? { settings: JSON.stringify(settings) } : {}),
-  };
+	// Load assets by convention based on filename
+	const { systemPrompt, settings } = assetsFor(import.meta.url);
+	const defaults: ClaudeFlags = {
+		...(systemPrompt ? { "append-system-prompt": systemPrompt } : {}),
+		...(settings ? { settings: JSON.stringify(settings) } : {}),
+	};
 
-  // Build Claude flags
-  const flags = buildClaudeFlags(defaults, parsedArgs.values as ClaudeFlags);
+	// Build Claude flags
+	const flags = buildClaudeFlags(defaults, parsedArgs.values as ClaudeFlags);
 
-  // Add the prompt as positional argument
-  const finalArgs = [...flags, userPrompt];
+	// Add the prompt as positional argument
+	const finalArgs = [...flags, userPrompt];
 
-  // Spawn Claude with diagram generation settings
-  const claudeProcess = spawn(["claude", ...finalArgs], {
-    stdin: "inherit",
-    stdout: "inherit",
-    stderr: "inherit",
-    env: {
-      ...process.env,
-      CLAUDE_PROJECT_DIR: targetProject,
-    },
-  });
+	// Spawn Claude with diagram generation settings
+	const claudeProcess = spawn(["claude", ...finalArgs], {
+		stdin: "inherit",
+		stdout: "inherit",
+		stderr: "inherit",
+		env: {
+			...process.env,
+			CLAUDE_PROJECT_DIR: targetProject,
+		},
+	});
 
-  const onExit = () => {
-    try {
-      claudeProcess.kill("SIGTERM");
-    } catch {}
-  };
-  process.on("SIGINT", onExit);
-  process.on("SIGTERM", onExit);
+	const onExit = () => {
+		try {
+			claudeProcess.kill("SIGTERM");
+		} catch {}
+	};
+	process.on("SIGINT", onExit);
+	process.on("SIGTERM", onExit);
 
-  await claudeProcess.exited;
-  console.log(`\n✨ Event flow diagram generation complete!`);
-  console.log(`📁 Diagrams saved to: ${diagramsDir}`);
+	await claudeProcess.exited;
+	console.log(`\n✨ Event flow diagram generation complete!`);
+	console.log(`📁 Diagrams saved to: ${diagramsDir}`);
 }
 
 main().catch(console.error);
-

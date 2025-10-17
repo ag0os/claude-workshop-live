@@ -37,9 +37,9 @@ export function assetsFor(importerUrl: string): AgentAssets {
   const mcpKey = key("settings", `${base}.mcp.json`);
 
   return {
-    systemPrompt: SYSTEM_PROMPTS[base],
-    prompt: PROMPTS[base],
-    settings: SETTINGS[base],
-    mcp: MCP[base],
+    systemPrompt: (SYSTEM_PROMPTS as Record<string, string>)[base],
+    prompt: (PROMPTS as Record<string, string>)[base],
+    settings: (SETTINGS as Record<string, Json>)[base],
+    mcp: (MCP as Record<string, Json>)[base],
   };
 }

@@ -3,24 +3,24 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "bun";
-import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { assetsFor } from "../lib/assets";
+import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 
 function slugify(input: string): string {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "")
-    .slice(0, 80);
+	return input
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/(^-|-$)+/g, "")
+		.slice(0, 80);
 }
 
 function resolvePath(relativeFromThisFile: string): string {
-  const url = new URL(relativeFromThisFile, import.meta.url);
-  return url.pathname;
+	const url = new URL(relativeFromThisFile, import.meta.url);
+	return url.pathname;
 }
 
-const projectRoot = resolvePath("../");
+const _projectRoot = resolvePath("../");
 
 // Get args: first positional is required topic, rest optional focus/filter details
 const positionals = getPositionals();
@@ -28,9 +28,11 @@ const [topic, ...rest] = positionals;
 const extraFocus = rest.join(" ");
 
 if (!topic) {
-  console.error("Missing required topic.");
-  console.error("Usage: bun run agents/diagram-topic.ts <topic> [extra focus words]");
-  process.exit(1);
+	console.error("Missing required topic.");
+	console.error(
+		"Usage: bun run agents/diagram-topic.ts <topic> [extra focus words]",
+	);
+	process.exit(1);
 }
 
 const topicSlug = slugify(topic);
@@ -39,10 +41,10 @@ const diagramsDir = join(targetProject, "ai", "diagrams");
 
 // Ensure output directory exists
 try {
-  mkdirSync(diagramsDir, { recursive: true });
-  console.log(`✅ Created/verified directory: ${diagramsDir}`);
+	mkdirSync(diagramsDir, { recursive: true });
+	console.log(`✅ Created/verified directory: ${diagramsDir}`);
 } catch (error) {
-  console.error(`Failed to create diagrams directory: ${error}`);
+	console.error(`Failed to create diagrams directory: ${error}`);
 }
 
 // Build the user prompt
@@ -65,42 +67,42 @@ Instructions:
 Begin by locating files/functions whose names, routes, types, or documentation match the topic and follow all call/data paths from those anchors.`;
 
 async function main() {
-  console.log("🎯 Starting topic-focused diagram generation...");
-  console.log(`🏷️ Topic: ${topic} (slug: ${topicSlug})`);
-  console.log(`📁 Target project: ${targetProject}`);
-  console.log(`📊 Diagrams will be saved to: ${diagramsDir}`);
+	console.log("🎯 Starting topic-focused diagram generation...");
+	console.log(`🏷️ Topic: ${topic} (slug: ${topicSlug})`);
+	console.log(`📁 Target project: ${targetProject}`);
+	console.log(`📊 Diagrams will be saved to: ${diagramsDir}`);
 
-  // Load assets by convention based on filename
-  const { systemPrompt, settings } = assetsFor(import.meta.url);
-  const defaults: ClaudeFlags = {
-    ...(systemPrompt ? { "append-system-prompt": systemPrompt } : {}),
-    ...(settings ? { settings: JSON.stringify(settings) } : {}),
-  };
+	// Load assets by convention based on filename
+	const { systemPrompt, settings } = assetsFor(import.meta.url);
+	const defaults: ClaudeFlags = {
+		...(systemPrompt ? { "append-system-prompt": systemPrompt } : {}),
+		...(settings ? { settings: JSON.stringify(settings) } : {}),
+	};
 
-  const flags = buildClaudeFlags(defaults, parsedArgs.values as ClaudeFlags);
-  const finalArgs = [...flags, userPrompt];
+	const flags = buildClaudeFlags(defaults, parsedArgs.values as ClaudeFlags);
+	const finalArgs = [...flags, userPrompt];
 
-  const claudeProcess = spawn(["claude", ...finalArgs], {
-    stdin: "inherit",
-    stdout: "inherit",
-    stderr: "inherit",
-    env: {
-      ...process.env,
-      CLAUDE_PROJECT_DIR: targetProject,
-    },
-  });
+	const claudeProcess = spawn(["claude", ...finalArgs], {
+		stdin: "inherit",
+		stdout: "inherit",
+		stderr: "inherit",
+		env: {
+			...process.env,
+			CLAUDE_PROJECT_DIR: targetProject,
+		},
+	});
 
-  const onExit = () => {
-    try {
-      claudeProcess.kill("SIGTERM");
-    } catch {}
-  };
-  process.on("SIGINT", onExit);
-  process.on("SIGTERM", onExit);
+	const onExit = () => {
+		try {
+			claudeProcess.kill("SIGTERM");
+		} catch {}
+	};
+	process.on("SIGINT", onExit);
+	process.on("SIGTERM", onExit);
 
-  await claudeProcess.exited;
-  console.log(`\n✨ Topic-focused diagram generation complete!`);
-  console.log(`📁 Diagrams saved to: ${diagramsDir}`);
+	await claudeProcess.exited;
+	console.log(`\n✨ Topic-focused diagram generation complete!`);
+	console.log(`📁 Diagrams saved to: ${diagramsDir}`);
 }
 
 main().catch(console.error);

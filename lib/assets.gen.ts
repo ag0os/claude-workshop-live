@@ -11,6 +11,7 @@ import SP_brainstorm from '../system-prompts/brainstorm-prompt.md' with { type: 
 import SP_builder from '../system-prompts/builder-prompt.md' with { type: 'text' }
 import SP_diagram_consolidate from '../system-prompts/diagram-consolidate-prompt.md' with { type: 'text' }
 import SP_prompt_improver from '../system-prompts/prompt-improver-prompt.md' with { type: 'text' }
+import SP_rails_backlog_coordinator from '../system-prompts/rails-backlog-coordinator-prompt.md' with { type: 'text' }
 import SP_diagram_all from '../system-prompts/diagram-all-prompt.md' with { type: 'text' }
 import SP_fix from '../system-prompts/fix-prompt.md' with { type: 'text' }
 import SP_feature from '../system-prompts/feature-prompt.md' with { type: 'text' }
@@ -31,11 +32,13 @@ import ST_diagram_topic from '../settings/diagram-topic.settings.json' with { ty
 import ST_design_audit from '../settings/design-audit.settings.json' with { type: 'json' }
 import ST_planner from '../settings/planner.settings.json' with { type: 'json' }
 import ST_designer from '../settings/designer.settings.json' with { type: 'json' }
+import ST_rails_backlog from '../settings/rails-backlog.settings.json' with { type: 'json' }
 import ST_diagram_consolidate from '../settings/diagram-consolidate.settings.json' with { type: 'json' }
 import MCP_brainstorm from '../settings/brainstorm.mcp.json' with { type: 'json' }
 import MCP_designer from '../settings/designer.mcp.json' with { type: 'json' }
 import MCP_orient from '../settings/orient.mcp.json' with { type: 'json' }
 import MCP_contain from '../settings/contain.mcp.json' with { type: 'json' }
+import MCP_rails_backlog from '../settings/rails-backlog.mcp.json' with { type: 'json' }
 import MCP_refactor from '../settings/refactor.mcp.json' with { type: 'json' }
 import MCP_builder from '../settings/builder.mcp.json' with { type: 'json' }
 import MCP_planner from '../settings/planner.mcp.json' with { type: 'json' }
@@ -53,6 +56,7 @@ export const SYSTEM_PROMPTS = {
   'fix': SP_fix,
   'orient': SP_orient,
   'prompt-improver': SP_prompt_improver,
+  'rails-backlog-coordinator': SP_rails_backlog_coordinator,
   'refactor': SP_refactor,
   'update-claudemd': SP_update_claudemd
 };
@@ -75,6 +79,7 @@ export const SETTINGS = {
   'diagram-topic': ST_diagram_topic,
   'orient': ST_orient,
   'planner': ST_planner,
+  'rails-backlog': ST_rails_backlog,
   'refactor': ST_refactor,
   'update-claudemd': ST_update_claudemd
 };
@@ -85,6 +90,7 @@ export const MCP = {
   'designer': MCP_designer,
   'orient': MCP_orient,
   'planner': MCP_planner,
+  'rails-backlog': MCP_rails_backlog,
   'refactor': MCP_refactor,
   'update-claudemd': MCP_update_claudemd
 };

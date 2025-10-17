@@ -38,7 +38,7 @@ async function main() {
 			"append-system-prompt": designerSystemPrompt,
 			settings: JSON.stringify(designerSettings),
 			"mcp-config": JSON.stringify(designerMcp),
-			"model": "sonnet"
+			model: "sonnet",
 		},
 		parsedArgs.values as ClaudeFlags,
 	);
@@ -57,7 +57,7 @@ async function main() {
 	const onExit = () => {
 		try {
 			child.kill("SIGTERM");
-		} catch { }
+		} catch {}
 	};
 	process.on("SIGINT", onExit);
 	process.on("SIGTERM", onExit);

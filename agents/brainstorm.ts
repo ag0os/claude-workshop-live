@@ -4,9 +4,9 @@ import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "bun";
+import { assetsFor } from "../lib/assets";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
 import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
-import { assetsFor } from "../lib/assets";
 
 function resolvePath(relativeFromThisFile: string): string {
 	const url = new URL(relativeFromThisFile, import.meta.url);
@@ -81,7 +81,7 @@ async function main() {
 	const onExit = () => {
 		try {
 			claudeProcess.kill("SIGTERM");
-		} catch { }
+		} catch {}
 	};
 	process.on("SIGINT", onExit);
 	process.on("SIGTERM", onExit);
