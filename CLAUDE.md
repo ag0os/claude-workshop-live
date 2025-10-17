@@ -26,6 +26,7 @@ Claude Workshop Live - A collection of TypeScript agents and utilities for enhan
 - `bun run agents/parallel.ts` - Run parallel operations
 - `bun run agents/designer.ts` - Design mode with Figma/Playwright integrations
 - `bun run agents/chain.ts` - Chain multiple Claude instances with data flow
+- `bun run agents/rails-backlog.ts` - Rails Backlog Task Coordinator - analyze backlog tasks and coordinate specialized Rails sub-agents
 
 ## Code Architecture
 
