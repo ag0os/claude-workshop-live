@@ -43,7 +43,7 @@ const userPrompt = positionals.join(" ");
 // Build Claude flags
 const flags = buildClaudeFlags({
 	settings: JSON.stringify(railsBacklogSettings),
-	"mcp-config": JSON.stringify([railsBacklogMcp]),
+	"mcp-config": JSON.stringify(railsBacklogMcp),
 	"append-system-prompt": railsBacklogSystemPrompt,
 });
 

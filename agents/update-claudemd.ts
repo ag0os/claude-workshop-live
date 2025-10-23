@@ -69,7 +69,7 @@ async function main() {
 	// Build Claude flags
 	const flags = buildClaudeFlags({
 		settings: JSON.stringify(updateClaudeMdSettings),
-		"mcp-config": JSON.stringify([updateClaudeMdMcp]),
+		"mcp-config": JSON.stringify(updateClaudeMdMcp),
 		"append-system-prompt": updateClaudeMdSystemPrompt,
 	});
 
