@@ -36,9 +36,10 @@ Claude Workshop Live - A collection of TypeScript agents and utilities for enhan
 - `settings/` - JSON configuration files for different agent modes (MCP configs and settings)
 - `prompts/` - Markdown prompt templates for various use cases
 - `system-prompts/` - System prompts for specialized behaviors
-- `hooks/` - Scripts that run in response to Claude events
+- `hooks/` - Type-safe hook scripts that run in response to Claude events (see [docs/HOOKS.md](docs/HOOKS.md))
 - `scripts/` - Build and development utilities
 - `bin/` - Compiled binaries (generated)
+- `docs/` - Documentation for framework features
 
 ### Key Libraries
 - `@anthropic-ai/claude-code` - Official Claude Code SDK
@@ -71,3 +72,4 @@ Claude Workshop Live - A collection of TypeScript agents and utilities for enhan
 - The project uses TypeScript with module syntax
 - Agents are designed to be compiled to standalone binaries with `bun compile`
 - Settings files follow the pattern: `<agent-name>.settings.json` and `<agent-name>.mcp.json`
+- Hooks are type-safe TypeScript scripts - see [docs/HOOKS.md](docs/HOOKS.md) for complete guide
