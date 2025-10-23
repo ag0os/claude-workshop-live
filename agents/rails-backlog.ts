@@ -18,6 +18,16 @@
  */
 
 import { spawn } from "bun";
+import { buildClaudeFlags, getPositionals } from "../lib/flags";
+import railsBacklogMcp from "../settings/rails-backlog.mcp.json" with {
+	type: "json",
+};
+import railsBacklogSettings from "../settings/rails-backlog.settings.json" with {
+	type: "json",
+};
+import railsBacklogSystemPrompt from "../system-prompts/rails-backlog-coordinator-prompt.md" with {
+	type: "text",
+};
 
 function resolvePath(relativeFromThisFile: string): string {
 	const url = new URL(relativeFromThisFile, import.meta.url);
@@ -25,18 +35,22 @@ function resolvePath(relativeFromThisFile: string): string {
 }
 
 const projectRoot = resolvePath("../");
-const settingsPath = resolvePath("../settings/rails-backlog.settings.json");
-const mcpPath = resolvePath("../settings/rails-backlog.mcp.json");
 
-const args = [
-	"--settings",
-	settingsPath,
-	"--mcp-config",
-	mcpPath,
-	...process.argv.slice(2),
-];
+// Get any prompt from positional arguments
+const positionals = getPositionals();
+const userPrompt = positionals.join(" ");
 
-const child = spawn(["claude", ...args], {
+// Build Claude flags
+const flags = buildClaudeFlags({
+	settings: JSON.stringify(railsBacklogSettings),
+	"mcp-config": JSON.stringify([railsBacklogMcp]),
+	"append-system-prompt": railsBacklogSystemPrompt,
+});
+
+// Add the prompt as positional argument if provided
+const args = userPrompt ? [...flags, userPrompt] : [...flags];
+
+const claudeProcess = spawn(["claude", ...args], {
 	stdin: "inherit",
 	stdout: "inherit",
 	stderr: "inherit",
@@ -48,12 +62,12 @@ const child = spawn(["claude", ...args], {
 
 const onExit = () => {
 	try {
-		child.kill("SIGTERM");
+		claudeProcess.kill("SIGTERM");
 	} catch {}
 };
 
 process.on("SIGINT", onExit);
 process.on("SIGTERM", onExit);
 
-await child.exited;
-process.exit(child.exitCode ?? 0);
+await claudeProcess.exited;
+process.exit(claudeProcess.exitCode ?? 0);
