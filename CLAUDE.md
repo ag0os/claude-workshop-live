@@ -27,6 +27,7 @@ Claude Workshop Live - A collection of TypeScript agents and utilities for enhan
 - `bun run agents/designer.ts` - Design mode with Figma/Playwright integrations
 - `bun run agents/chain.ts` - Chain multiple Claude instances with data flow
 - `bun run agents/rails-backlog.ts` - Rails Backlog Task Coordinator - analyze backlog tasks and coordinate specialized Rails sub-agents
+- `bun run agents/plan-coordinator.ts` - Implementation Plan Coordinator - coordinate sub-agents to implement a plan step by step
 
 ## Code Architecture
 
@@ -65,6 +66,14 @@ Claude Workshop Live - A collection of TypeScript agents and utilities for enhan
 - Avoid dashes in prose text
 - Use `fd` for finding files, `rg` for searching contents
 
+## Deployment
+
+When compiling agents for use in other projects:
+- `bun compile <file>` automatically copies `hooks/` to `bin/hooks/`
+- Compiled binaries MUST be distributed with the `bin/hooks/` directory
+- Agents that use hooks: `plan-coordinator`, `rails-backlog`, `contain`, `planner`, `refactor`
+- See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete deployment guide
+
 ## Important Notes
 
 - This is a Bun project - use `bun` not `npm` or `yarn`
@@ -73,3 +82,4 @@ Claude Workshop Live - A collection of TypeScript agents and utilities for enhan
 - Agents are designed to be compiled to standalone binaries with `bun compile`
 - Settings files follow the pattern: `<agent-name>.settings.json` and `<agent-name>.mcp.json`
 - Hooks are type-safe TypeScript scripts - see [docs/HOOKS.md](docs/HOOKS.md) for complete guide
+- When deploying compiled binaries, always include the `bin/hooks/` directory
