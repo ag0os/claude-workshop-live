@@ -10,17 +10,5 @@
       "mcp__playwright__wait_for",
       "mcp__playwright__screenshot"
     ]
-  },
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run $CLAUDE_PROJECT_DIR/hooks/cc-stop.ts"
-          }
-        ]
-      }
-    ]
   }
 }
