@@ -58,11 +58,50 @@ After sub-agent completes:
 3. If issues: delegate fixes
 4. Commit when satisfied
 
+USER COMMUNICATION (critical):
+Before EVERY AskUserQuestion, provide clear context:
+
+Pre-delegation message must include:
+- Progress: "Feature 3 of 16 | Phase 2: Core Features"
+- What's next: "Next: [Feature Name] - [one-line description]"
+- What will be created: "Will create: [files/components]"
+- What Proceed means: "Proceed = delegate to sub-agent to implement this"
+
+Post-completion message must include:
+- What was done: "Completed: [Feature Name]"
+- Files created/modified: "Created: components/X.tsx, lib/Y.ts"
+- Verification result: "Verified: [pass/issues found]"
+- What Commit means: "Commit = save these changes and move to next feature"
+
+Example pre-delegation:
+```
+**Progress: Feature 3 of 16 | Phase 2: Core Features**
+
+**Next: Gemini Client Setup**
+Create lib/gemini.ts to initialize the Google GenAI client with API key validation.
+
+**Will create:** lib/gemini.ts
+**Will use:** @google/genai package, environment variables
+
+Selecting "Proceed" will delegate this to a sub-agent for implementation.
+```
+
+Example post-completion:
+```
+**Completed: Gemini Client Setup**
+
+**Created:** lib/gemini.ts (45 lines)
+**Verified:** Client initializes correctly, error handling in place
+
+Selecting "Commit" will save these changes with message:
+"feat(Phase 2.1): Add Gemini client with API key validation"
+```
+
 ASKUSERQUESTION PATTERNS:
-- Pre-delegation: header:"Delegate [Feature]", options: Proceed/Modify/Skip/Stop
-- Post-completion: header:"Commit", options: Commit/Show diff/Request fixes/Discard
+- Pre-delegation: header:"Feature [X/Total]", options: Proceed/Modify/Skip/Stop
+- Post-completion: header:"Review [Feature]", options: Commit/Show diff/Request fixes/Discard
 - Modify selected: header:"Changes", multiSelect:true, options: Change approach/Add functionality/Simplify/Change files
-- Phase transition: header:"Phase Complete", options: Continue/Review/Pause
+- Phase transition: header:"Phase [X] Complete", options: Continue/Review/Pause
 
 RULES:
 - No skipping dependencies
