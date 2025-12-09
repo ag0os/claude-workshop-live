@@ -1,50 +1,68 @@
+#!/usr/bin/env -S bun run
 /**
- * PLANNER: Launch Claude Code in planning mode
+ * PLANNER: Interactive implementation plan creator
  *
- * Loads planning-focused settings and MCP servers that are read-only and research-oriented.
+ * Creates high-level implementation plans through interactive requirements
+ * gathering. Plans are consumed by coordinator agents (builder, plan-coordinator).
  *
- * Run:
- *   bun run agents/planner.ts            # interactive
- *   bun run agents/planner.ts -p "..."   # print mode
+ * Usage:
+ *   bun run agents/planner.ts                    # interactive mode
+ *   bun run agents/planner.ts "build a todo app" # with initial prompt
  */
 
 import { spawn } from "bun";
+import type { ClaudeFlags } from "../lib/claude-flags.types";
+import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 
-function resolvePath(relativeFromThisFile: string): string {
-	const url = new URL(relativeFromThisFile, import.meta.url);
-	return url.pathname;
-}
-
-const projectRoot = resolvePath("../");
-const settingsPath = resolvePath("../settings/planner.settings.json");
-const mcpPath = resolvePath("../settings/planner.mcp.json");
-
-const args = [
-	"--settings",
-	settingsPath,
-	"--mcp-config",
-	mcpPath,
-	...process.argv.slice(2),
-];
-
-const child = spawn(["claude", ...args], {
-	stdin: "inherit",
-	stdout: "inherit",
-	stderr: "inherit",
-	env: {
-		...process.env,
-		CLAUDE_PROJECT_DIR: projectRoot,
-	},
-});
-
-const onExit = () => {
-	try {
-		child.kill("SIGTERM");
-	} catch {}
+import plannerSystemPrompt from "../system-prompts/planner-prompt.md" with {
+	type: "text",
 };
 
-process.on("SIGINT", onExit);
-process.on("SIGTERM", onExit);
+const plannerSettings = {
+	permissions: {
+		defaultMode: "default",
+		allow: [],
+	},
+};
 
-await child.exited;
-process.exit(child.exitCode ?? 0);
+const plannerMcp = {
+	mcpServers: {},
+};
+
+async function main() {
+	const positionals = getPositionals();
+	const userPrompt = positionals.join(" ").trim();
+
+	const flags = buildClaudeFlags(
+		{
+			"append-system-prompt": plannerSystemPrompt,
+			settings: JSON.stringify(plannerSettings),
+			"mcp-config": JSON.stringify(plannerMcp),
+		},
+		parsedArgs.values as ClaudeFlags,
+	);
+	const args = userPrompt ? [...flags, userPrompt] : [...flags];
+
+	const child = spawn(["claude", ...args], {
+		stdin: "inherit",
+		stdout: "inherit",
+		stderr: "inherit",
+		env: {
+			...process.env,
+			CLAUDE_PROJECT_DIR: process.cwd(),
+		},
+	});
+
+	const onExit = () => {
+		try {
+			child.kill("SIGTERM");
+		} catch {}
+	};
+	process.on("SIGINT", onExit);
+	process.on("SIGTERM", onExit);
+
+	await child.exited;
+	process.exit(child.exitCode ?? 0);
+}
+
+await main();
