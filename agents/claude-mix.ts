@@ -1,6 +1,6 @@
 #!/usr/bin/env -S bun run
 import { parseArgs } from "node:util";
-import { query } from "@anthropic-ai/claude-code";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 import { $ } from "bun";
 import systemPrompt from "../prompts/claude-mix.md" with { type: "text" };
 
@@ -18,7 +18,7 @@ if (!userPrompt) {
 const response = query({
 	prompt: userPrompt,
 	options: {
-		customSystemPrompt: systemPrompt,
+		systemPrompt: systemPrompt,
 		mcpServers: {},
 
 		allowedTools: ["Bash(repomix:*)"],

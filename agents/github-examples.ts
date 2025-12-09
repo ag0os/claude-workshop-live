@@ -1,6 +1,6 @@
 #!/usr/bin/env -S bun run
 import { parseArgs } from "node:util";
-import { type McpServerConfig, query } from "@anthropic-ai/claude-code";
+import { type McpServerConfig, query } from "@anthropic-ai/claude-agent-sdk";
 import { $ } from "bun";
 import systemPrompt from "../prompts/github-examples.md" with { type: "text" };
 
@@ -165,7 +165,7 @@ const response = query({
 	prompt: userPrompt,
 	options: {
 		pathToClaudeCodeExecutable: claudePath,
-		customSystemPrompt: systemPrompt,
+		systemPrompt: systemPrompt,
 		allowedTools,
 		disallowedTools,
 		mcpServers,
