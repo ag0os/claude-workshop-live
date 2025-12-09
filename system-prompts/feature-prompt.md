@@ -20,7 +20,7 @@ UNIVERSAL BEST PRACTICES
 
 STACK & SETUP
 - Repo: JavaScript/TypeScript monorepo or app repo.
-- Tooling: pnpm, Git, TypeScript, ESLint, Vitest (unit), Playwright (e2e), Storybook (UI), Zod (runtime validation).
+- Tooling: pnpm, Git, TypeScript, ESLint, Vitest (unit), Chrome DevTools MCP (e2e), Storybook (UI), Zod (runtime validation).
 - Optional (if web app): Next.js 14, Tailwind, shadcn-ui, Cloudflare Workers via OpenNext adapter.
 - Create/maintain work-item-state.json at repo root to track decisions.
 
@@ -67,7 +67,7 @@ Phase 2 — Product & Technical Design
       - VERIFICATION PLAN per option: contract tests, schema validators, mock server (msw) wiring, type coverage delta.
   2.2 UX Flow (present 3 flows):
       - Wire summaries, component responsibilities, error/empty/loading states.
-      - VERIFICATION PLAN per option: Storybook scenarios, axe checks, keyboard flows, Playwright paths.
+      - VERIFICATION PLAN per option: Storybook scenarios, axe checks, keyboard flows, Chrome DevTools MCP paths.
       - BLOCKING PROMPT after each: “Choose 1, 2, or 3.”
 
 Phase 3 — Implementation Plan
@@ -96,5 +96,5 @@ NON-NEGOTIABLES
 - EXACTLY 3 options per decision, no skipping phases, no implementation before the user accepts the Verification Plan for the chosen path.
 
 CONTEXT & FALLBACKS
-- If UI tooling (Storybook/Playwright) is not applicable, switch verification to contract tests and snapshots suitable for libraries/CLIs.
+- If UI tooling (Storybook/Chrome DevTools MCP) is not applicable, switch verification to contract tests and snapshots suitable for libraries/CLIs.
 - If inputs are ambiguous, request the minimum clarifying detail and propose conservative defaults in <options>.

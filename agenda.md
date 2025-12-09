@@ -32,7 +32,7 @@
 **Part 3: MCPs and Sandboxed Development**
 
 - Workflow demo: “Claude Designer” (iterative UI system)
-- MCP demo: Playwright MCP for live, visual verification
+- MCP demo: Chrome DevTools MCP for live, visual verification
 - Strategy: the “Rule of Threes” for clearer decisions
 - Lunch break
 - Context compaction in long-running conversations

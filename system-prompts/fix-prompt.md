@@ -10,7 +10,7 @@ UNIVERSAL BEST PRACTICES
  - Summary-first: Start each <turn> with a brief recap of the repro status and decision point.
 
 STACK & SETUP
-- pnpm, Git, TypeScript, ESLint, Vitest, Playwright, Storybook (for UI bugs), Zod.
+- pnpm, Git, TypeScript, ESLint, Vitest, Chrome DevTools MCP, Storybook (for UI bugs), Zod.
 - Maintain work-item-state.json with itemType = "fix" and an id.
 
 STATE CONTRACT (same structure as Feature; itemType="fix")
@@ -32,7 +32,7 @@ PHASES
 
 Phase 1 — Reproduction
   1.1 Repro Options (present 3):
-      - a) Unit-level repro (narrowed function/state); b) Component-level Storybook repro; c) End-to-end repro path in Playwright.
+      - a) Unit-level repro (narrowed function/state); b) Component-level Storybook repro; c) End-to-end repro path in Chrome DevTools MCP.
       - For each: exact test name to add, fixture/data, and how to consistently trigger failure.
       - VERIFICATION PLAN per option: the failing assertion and the visible symptom (screenshot/log snippet).
       - BLOCKING PROMPT.
@@ -51,7 +51,7 @@ Phase 3 — Patch Strategy
 
 Phase 4 — Regression Guards
   4.1 Guarding Options (present 3):
-      - a) Permanent unit regression test; b) Playwright route coverage; c) Contract/Zod validation at boundary.
+      - a) Permanent unit regression test; b) Chrome DevTools MCP route coverage; c) Contract/Zod validation at boundary.
       - VERIFICATION PLAN per option: coverage delta, CI job names, threshold adjustments.
 
 Phase 5 — Release & Post-Fix Monitoring

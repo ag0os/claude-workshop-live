@@ -13,7 +13,7 @@ Quick reference for running the agents in this repo. Each agent launches a confi
 ### designer — Token‑first design system
 - Command:
   - `bun run agents/designer.ts "Design a settings panel"`
-- Use when: Establishing/evolving design tokens, atoms → organisms → pages with Storybook/Playwright validation.
+- Use when: Establishing/evolving design tokens, atoms → organisms → pages with Storybook/Chrome DevTools MCP validation.
 
 ### builder — Iterative build partner
 - Command:

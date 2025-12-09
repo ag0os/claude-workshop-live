@@ -2,13 +2,13 @@
   "permissions": {
     "defaultMode": "default",
     "allow": [
-      "mcp__playwright__navigate",
-      "mcp__playwright__open",
-      "mcp__playwright__click",
-      "mcp__playwright__type",
-      "mcp__playwright__press",
-      "mcp__playwright__wait_for",
-      "mcp__playwright__screenshot"
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__new_page",
+      "mcp__chrome-devtools__click",
+      "mcp__chrome-devtools__fill",
+      "mcp__chrome-devtools__press_key",
+      "mcp__chrome-devtools__wait_for",
+      "mcp__chrome-devtools__take_screenshot"
     ]
   },
   "hooks": {

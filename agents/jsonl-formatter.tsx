@@ -282,7 +282,7 @@ const recipes: Record<string, Recipe> = {
 .[] | select(.type=="system")
 | .tools
 | map(
-    if startswith("mcp__playwright__") then "playwright"
+    if startswith("mcp__chrome-devtools__") then "chrome-devtools"
     elif startswith("mcp__deepwiki__") then "deepwiki"
     else "core"
     end

@@ -49,7 +49,7 @@ claude "test" --print --output-format json --verbose | ./jq-filters/mcp-servers-
 # Output:
 # | Server | Status |
 # |---|---|
-# | playwright | connected |
+# | chrome-devtools | connected |
 # | deepwiki | connected |
 ```
 
@@ -68,7 +68,7 @@ claude "test" --print --output-format json --verbose | ./jq-filters/tool-counts.
 **Example:**
 ```bash
 claude "test" --print --output-format json --verbose | ./jq-filters/tools-by-origin.jq
-# Output: [{"group": "core", "count": 16}, {"group": "playwright", "count": 24}]
+# Output: [{"group": "core", "count": 16}, {"group": "chrome-devtools", "count": 24}]
 ```
 
 ### Timeline Summary

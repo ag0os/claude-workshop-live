@@ -24,7 +24,7 @@ Claude Workshop Live - A collection of TypeScript agents and utilities for enhan
 - `bun run agents/gemsum.ts` - Gemini-powered summarization
 - `bun run agents/claude-mix.ts` - Claude with mixed capabilities
 - `bun run agents/parallel.ts` - Run parallel operations
-- `bun run agents/designer.ts` - Design mode with Figma/Playwright integrations
+- `bun run agents/designer.ts` - Design mode with Figma/Chrome DevTools integrations
 - `bun run agents/chain.ts` - Chain multiple Claude instances with data flow
 - `bun run agents/rails-backlog.ts` - Rails Backlog Task Coordinator - analyze backlog tasks and coordinate specialized Rails sub-agents
 - `bun run agents/plan-coordinator.ts` - Implementation Plan Coordinator - coordinate sub-agents to implement a plan step by step

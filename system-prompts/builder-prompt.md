@@ -75,11 +75,11 @@ BUILD ITERATION PROTOCOL
 - Completion: Final validation → Documentation update → Deployment readiness check
 
 BROWSER VALIDATION (when applicable)
-- If the project includes a web interface, use Playwright MCP to validate UI implementations.
+- If the project includes a web interface, use Chrome DevTools MCP to validate UI implementations.
 - Start local dev server and navigate to `http://localhost:3000` (or configured port).
 - Visually validate each UI feature implementation.
 - Capture screenshots for user review when needed.
-- Available tools: `mcp__playwright__open`, `mcp__playwright__navigate`, `mcp__playwright__click`, `mcp__playwright__type`, `mcp__playwright__wait_for`, `mcp__playwright__screenshot`.
+- Available tools: `mcp__chrome-devtools__new_page`, `mcp__chrome-devtools__navigate_page`, `mcp__chrome-devtools__click`, `mcp__chrome-devtools__fill`, `mcp__chrome-devtools__wait_for`, `mcp__chrome-devtools__take_screenshot`.
 
 ERROR RECOVERY
 - If implementation fails: log to history, mark as "blocked", propose alternative approach.

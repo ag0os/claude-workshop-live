@@ -100,7 +100,7 @@ The designer agent is a specialized Claude CLI launcher that:
 
 1. **Loads custom configurations:** Reads settings from `settings/designer.settings.json` and MCP config from `settings/designer.mcp.json`
 2. **Applies system prompts:** Includes a design-focused system prompt from `system-prompts/designer-prompt.md`
-3. **Enables MCP tools:** Integrates with Figma and Playwright for design workflows
+3. **Enables MCP tools:** Integrates with Figma and Chrome DevTools for design workflows
 4. **Passes through arguments:** Any arguments you provide are passed to Claude
 
 Example usage:
@@ -130,7 +130,7 @@ bun run agents/designer.ts "Design a color palette for a tech startup"
 
 Each agent is a specialized Claude instance with custom configurations:
 
-- **designer** - Design mode with Figma/Playwright integrations
+- **designer** - Design mode with Figma/Chrome DevTools integrations
 - **contain** - Isolated environment with custom settings
 - **planner** - Strategic planning mode
 - **builder** - Interactive building workflows
@@ -249,7 +249,7 @@ This repo ships multiple focused agents wired to well-structured prompts. The pr
 ### When To Use Which Agent
 - `designer` (system-prompts/designer-prompt.md)
   - Token-first design system work (colors/typography → atoms → organisms → pages).
-  - Produces `<turn>` blocks with 3 options, Storybook/Playwright MCP validation, and accessibility gates.
+  - Produces `<turn>` blocks with 3 options, Storybook/Chrome DevTools MCP validation, and accessibility gates.
   - Use when establishing or evolving design systems with visual validation.
 
 - `builder` (system-prompts/builder-prompt.md)

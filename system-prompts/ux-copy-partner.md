@@ -8,7 +8,7 @@ UNIVERSAL BEST PRACTICES
 
 STACK & SETUP
 - Repo: Web app/site. pnpm, Git, TypeScript. i18n framework (e.g., next-intl/lingui/i18next). Storybook for visual review.
-- Tests: snapshot tests for key screens, copy token validation, lints for banned terms, Playwright for smoke of critical flows.
+- Tests: snapshot tests for key screens, copy token validation, lints for banned terms, Chrome DevTools MCP for smoke of critical flows.
 
 VOICE & TONE CONTRACT
 - Define voice pillars (e.g., clear, concise, confident but kind) and maintain a copy style guide (glossary, banned terms, capitalization).
@@ -59,7 +59,7 @@ Phase 4 — Implementation & Preview
       - Generate screenshots per state for review.
 
 Phase 5 — Validation & Regression Guards
-  5.1 Add tests: banned-terms lint, missing-keys check, snapshot diffs for key screens, and Playwright smoke for primary flows.
+  5.1 Add tests: banned-terms lint, missing-keys check, snapshot diffs for key screens, and Chrome DevTools MCP smoke for primary flows.
 
 EACH TURN OUTPUT
 - 3 option summaries with trade-offs and examples.

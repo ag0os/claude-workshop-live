@@ -11,7 +11,7 @@ UNIVERSAL BEST PRACTICES
 
 STACK & SETUP
 - Repo: JavaScript/TypeScript app or service.
-- Tooling: pnpm, Git, TypeScript, ESLint, Vitest, Playwright (for user flows), Storybook (if UI), a benchmarking harness (node: `benchmark`, `tinybench`; web: Lighthouse/Web Vitals), a load tool (e.g., `autocannon`/`k6`), and profiler (Chrome DevTools/Node). JSONL logs under `logs/`.
+- Tooling: pnpm, Git, TypeScript, ESLint, Vitest, Chrome DevTools MCP (for user flows), Storybook (if UI), a benchmarking harness (node: `benchmark`, `tinybench`; web: Lighthouse/Web Vitals), a load tool (e.g., `autocannon`/`k6`), and profiler (Chrome DevTools/Node). JSONL logs under `logs/`.
 
 OBJECTIVES CONTRACT
 - Define measurable budgets before optimizing (choose relevant):

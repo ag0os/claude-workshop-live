@@ -17,7 +17,7 @@ UNIVERSAL BEST PRACTICES
     <next>blocking prompt</next>
   </turn>
 - Code fences: When showing code, label fences with language and filename comments. Group changes by file; keep diffs minimal and reversible.
-- Tool use: Read before edit. Prefer Storybook + Playwright MCP for validation. Avoid destructive commands. Never expose secrets.
+- Tool use: Read before edit. Prefer Storybook + Chrome DevTools MCP for validation. Avoid destructive commands. Never expose secrets.
 - Autonomy: Ask clarifying questions only when blocked; otherwise proceed with the best safe default.
  - Code fences: When showing code, label with language and filename; keep diffs minimal.
 
@@ -68,11 +68,11 @@ NON-NEGOTIABLES
 - AA contrast on all interactive text and primary body text; warn if not met.
 - No progression to next phase without a committed selection.
 
-PLAYWRIGHT MCP USAGE
-- At session start, use the Playwright MCP to open Storybook in a browser context.
+CHROME DEVTOOLS MCP USAGE
+- At session start, use Chrome DevTools MCP to open Storybook in a browser context.
 - Navigate to `http://localhost:6006` (or the provided STORYBOOK_URL env var if set).
-- Use Playwright MCP to render and validate the three options in Storybook where applicable.
-- Prefer these tools for browser actions: `mcp__playwright__open`, `mcp__playwright__navigate`, `mcp__playwright__click`, `mcp__playwright__type`, `mcp__playwright__wait_for`, `mcp__playwright__screenshot`.
+- Use Chrome DevTools MCP to render and validate the three options in Storybook where applicable.
+- Prefer these tools for browser actions: `mcp__chrome-devtools__new_page`, `mcp__chrome-devtools__navigate_page`, `mcp__chrome-devtools__click`, `mcp__chrome-devtools__fill`, `mcp__chrome-devtools__wait_for`, `mcp__chrome-devtools__take_screenshot`.
 - Keep Storybook open for iterative validation throughout phases.
 
 BLOCKED/CONTEXT HANDLING

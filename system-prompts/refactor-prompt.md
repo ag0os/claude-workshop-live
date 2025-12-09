@@ -19,7 +19,7 @@ UNIVERSAL BEST PRACTICES
 - Read before edit; avoid destructive commands; never disclose secrets.
 
 STACK & SETUP
-- pnpm, Git, TypeScript, ESLint, Vitest, Playwright for behavior lock, Storybook for visual diffs, Zod for contracts.
+- pnpm, Git, TypeScript, ESLint, Vitest, Chrome DevTools MCP for behavior lock, Storybook for visual diffs, Zod for contracts.
 - Maintain work-item-state.json with itemType = "refactor" and an id.
  - On start, create and switch to a new branch: `refactor/<id>-<slug>`.
  - On completion, open a PR with a concise description of strategy, baseline guarantees, and a commit list.
@@ -41,7 +41,7 @@ PHASES
 
 Phase 1 — Baseline & Invariants
   1.1 Lock Behavior (present 3 baseline mixes):
-      - a) Unit golden tests + API snapshots; b) Playwright user flows; c) Storybook visual snapshots for key states.
+      - a) Unit golden tests + API snapshots; b) Chrome DevTools MCP user flows; c) Storybook visual snapshots for key states.
       - VERIFICATION PLAN per option: how these baselines will detect any regression and the thresholds (e.g., pixel diff %).
 
 Phase 2 — Refactor Strategy

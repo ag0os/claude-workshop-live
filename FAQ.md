@@ -36,11 +36,11 @@ Claude hooks don’t track git state by default. Create custom hook logic (e.g.,
 
 Docs: [Hooks reference](https://docs.anthropic.com/en/docs/claude-code/hooks)
 
-### Playwright MCP: will it keep my login session?
+### Chrome DevTools MCP: will it keep my login session?
 
-Yes—persist and reuse auth with Playwright `storageState` (cookies/localStorage). Save a state file after login and load it in new contexts.
+Yes—persist and reuse auth by keeping Chrome open with your logged-in session. The Chrome DevTools MCP connects to an existing Chrome instance, so your session state is maintained as long as Chrome is running.
 
-Docs: [Playwright auth: reuse signed-in state](https://playwright.dev/python/docs/auth)
+Docs: [Chrome DevTools MCP](https://github.com/anthropics/anthropic-quickstarts/tree/main/mcp-chrome-devtools)
 
 ### What is JSONL and why use it for logs/streams?
 
@@ -54,12 +54,12 @@ Yes. Use XML-like tags (e.g., `<instructions>`, `<data>`, `<format>`) to structu
 
 Docs: [Use XML tags](https://docs.anthropic.com/en/docs/use-xml-tags), [Long context tips](https://docs.anthropic.com/en/docs/long-context-window-tips)
 
-### How do I connect Playwright (or other tools) via MCP?
+### How do I connect Chrome DevTools (or other tools) via MCP?
 
 - Add an MCP server entry pointing at the server command (often via `npx`).
 - For Claude Desktop, edit `claude_desktop_config.json` and restart; for Cursor, edit `~/.cursor/mcp.json` or project `.cursor/mcp.json`.
 
-References: [Playwright MCP Server (installation)](https://executeautomation.github.io/mcp-playwright/docs/local-setup/Installation), [Claude Desktop MCP setup](https://help.emporiaenergy.com/en/articles/11519323-claude-desktop-mcp-setup)
+References: [Chrome DevTools MCP](https://github.com/anthropics/anthropic-quickstarts/tree/main/mcp-chrome-devtools), [Claude Desktop MCP setup](https://help.emporiaenergy.com/en/articles/11519323-claude-desktop-mcp-setup)
 
 ### Can I run Claude Code itself as an MCP server?
 

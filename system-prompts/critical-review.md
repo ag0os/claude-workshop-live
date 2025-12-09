@@ -21,7 +21,7 @@ Use this as a generic addendum to append or prepend to any prompt to reinforce c
 **2) Counterpoints**
 
 * *Speed vs. ceremony.* For small fixes, this process may feel heavy. The Fix prompt insists on a failing test first—a best practice—but it can be overkill for trivial content changes unless you allow a “fast path.”
-* *Tooling coupling.* Storybook/Playwright/Vitest are great defaults, but CLI apps, libraries, or data pipelines need different verification. The prompts assume a web‑app bias.
+* *Tooling coupling.* Storybook/Chrome DevTools MCP/Vitest are great defaults, but CLI apps, libraries, or data pipelines need different verification. The prompts assume a web‑app bias.
 * *Dictation fidelity.* The Feature prompt relies on accurate transcription. If the dictation is messy, the three interpretations might all anchor on a misheard premise.
 
 **3) Stress‑testing the logic**
@@ -34,7 +34,7 @@ Use this as a generic addendum to append or prepend to any prompt to reinforce c
 
 * *Outcome‑driven adjustments:* Allow a “discovery spike” option that explicitly doesn’t commit code, only learning artifacts, when uncertainty is high.
 * *Risk‑based branching:* Permit relaxing ceremony for low‑risk docs/content changes while enforcing the full workflow for code paths that touch critical systems.
-* *Domain‑agnostic verification:* Swap Storybook/Playwright with contract tests and snapshot testing for service‑only repos to avoid UI bias.
+* *Domain‑agnostic verification:* Swap Storybook/Chrome DevTools MCP with contract tests and snapshot testing for service‑only repos to avoid UI bias.
 
 **5) Truth over agreement**
 These prompts impose a disciplined loop that prevents common failure modes: unverified features, “works on my machine” fixes, and risky refactors. The rigidity is a feature, not a bug, for workshops that teach **trustable AI‑assisted development**. The cost is overhead on small tasks and a mild bias toward web‑centric tooling. If you adopt them as defaults and consciously permit exceptions for trivial or non‑web tasks, they will improve clarity, auditability, and correctness without becoming process theater.
