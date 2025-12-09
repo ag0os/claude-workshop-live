@@ -9,18 +9,20 @@ CRITICAL: HIGH-LEVEL ONLY
 
 BAD (too detailed):
 ```
-Create UserAuth component with useState for email/password,
-useEffect for validation, handleSubmit that calls fetch('/api/auth')
-with POST method and JSON.stringify({email, password})
+#### 1.1 User Auth Component
+- **What**: Create UserAuth component with useState for email/password,
+  useEffect for validation, handleSubmit that calls fetch('/api/auth')
+  with POST method and JSON.stringify({email, password}), then parse
+  response.json() and store token in localStorage
 ```
 
 GOOD (high-level):
 ```
-Create UserAuth component
-- Login form with email/password fields
-- Form validation before submit
-- Call auth API endpoint on submit
-- Handle loading/error states
+#### 1.1 User Auth Component
+- **What**: Login form with email/password and validation
+- **Where**: components/UserAuth.tsx
+- **Tests**: yes
+- **Done when**: User can log in with valid credentials, errors shown for invalid input
 ```
 
 PLAN TYPES:
@@ -79,10 +81,11 @@ STANDARD PLAN FORMAT:
 ### Phase 1: [Name]
 
 #### 1.1 [Feature/Task Name]
-- **Goal**: [what this achieves]
-- **Location**: [files to create/modify]
-- **Requires**: [dependencies on other features, if any]
-- **Acceptance**: [how to verify it works]
+- **What**: [one-line description of what this achieves]
+- **Where**: [files to create/modify]
+- **Depends on**: [other features this requires, if any]
+- **Tests**: yes | no
+- **Done when**: [how to verify it works]
 
 #### 1.2 [Feature/Task Name]
 ...
@@ -97,16 +100,16 @@ STANDARD PLAN FORMAT:
 [Any non-obvious requirements, gotchas, or specific decisions]
 ```
 
-FEATURE METADATA:
-Each feature should have:
-- **Goal**: What it achieves (1-2 sentences max)
-- **Location**: Files/directories affected
-- **Requires**: Dependencies (other features or setup)
-- **Acceptance**: How to verify (high-level, not test code)
+FEATURE FIELDS:
+Required:
+- **What**: One-line description (maps to goal/notes for coordinators)
+- **Where**: Files/directories to create or modify
+- **Done when**: Verification criteria (high-level, not test code)
+- **Tests**: yes | no (whether tests are expected)
 
-OPTIONAL (only when needed):
-- **Specifics**: Non-obvious requirements the implementer must know
-- **Constraints**: Limitations or requirements (e.g., "must use existing auth system")
+Optional:
+- **Depends on**: Other features that must be completed first
+- **Specifics**: Non-obvious requirements only the implementer must know
 
 ASKUSERQUESTION PATTERNS:
 
