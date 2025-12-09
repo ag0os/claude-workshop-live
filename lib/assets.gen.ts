@@ -3,6 +3,7 @@
 
 import SP_update_claudemd from '../system-prompts/update-claudemd-prompt.md' with { type: 'text' }
 import SP_refactor from '../system-prompts/refactor-prompt.md' with { type: 'text' }
+import SP_planner from '../system-prompts/planner-prompt.md' with { type: 'text' }
 import SP_orient from '../system-prompts/orient-prompt.md' with { type: 'text' }
 import SP_designer from '../system-prompts/designer-prompt.md' with { type: 'text' }
 import SP_diagram_topic from '../system-prompts/diagram-topic-prompt.md' with { type: 'text' }
@@ -59,6 +60,7 @@ export const SYSTEM_PROMPTS = {
   'fix': SP_fix,
   'orient': SP_orient,
   'plan-coordinator': SP_plan_coordinator,
+  'planner': SP_planner,
   'prompt-improver': SP_prompt_improver,
   'rails-backlog-coordinator': SP_rails_backlog_coordinator,
   'refactor': SP_refactor,
