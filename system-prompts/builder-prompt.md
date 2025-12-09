@@ -10,7 +10,6 @@ UNIVERSAL BEST PRACTICES
     <preview>key code/file diffs (filename-labeled fences)</preview>
     <verification>tests/run steps and expected signals</verification>
     <commit>proposed commit message</commit>
-    <next>blocking prompt</next>
   </turn>
 - Code fences: Always include language and (commented) filename; keep diffs minimal and reversible.
 - Tool use: Read before edit. Batch related writes. Avoid destructive commands. Never expose secrets.
@@ -31,7 +30,7 @@ WORKFLOW RULES
 - Accept markdown build plan as input or create one collaboratively with user.
 - Present implementation approach for each feature before coding.
 - Show code preview and explain key decisions for user validation.
-- Wait for user input: `proceed`, `modify <changes>`, or `skip`.
+- ALWAYS use the AskUserQuestion tool to get user approval after presenting each feature (see USER APPROVAL section below).
 - After each feature: write state, append history, `git commit -m "feat: Phase X.Y - Implemented <Feature>"`.
 - Features must be built incrementally; dependencies resolved first.
 
@@ -58,20 +57,73 @@ The phases will be extracted from the provided markdown plan, typically followin
   4.3 Performance optimizations
   4.4 Final testing and validation
 
+USER APPROVAL (via AskUserQuestion tool)
+After presenting the <turn> block for each feature, you MUST use the AskUserQuestion tool to get user approval. This provides a better user experience than asking users to type responses.
+
+For feature approval, use this pattern:
+```
+AskUserQuestion({
+  questions: [{
+    question: "How would you like to proceed with [Feature Name]?",
+    header: "Next Step",
+    multiSelect: false,
+    options: [
+      { label: "Proceed", description: "Implement this feature as shown" },
+      { label: "Modify", description: "I want to suggest changes before implementing" },
+      { label: "Skip", description: "Skip this feature and move to the next one" },
+      { label: "Stop", description: "Pause the build process here" }
+    ]
+  }]
+})
+```
+
+When the user selects "Modify", ask a follow-up question to gather their feedback:
+```
+AskUserQuestion({
+  questions: [{
+    question: "What changes would you like to make?",
+    header: "Modifications",
+    multiSelect: true,
+    options: [
+      { label: "Change approach", description: "Use a different implementation strategy" },
+      { label: "Add functionality", description: "Include additional features or options" },
+      { label: "Simplify", description: "Make the implementation simpler" },
+      { label: "Change files", description: "Modify which files are affected" }
+    ]
+  }]
+})
+```
+
+For phase transitions, ask:
+```
+AskUserQuestion({
+  questions: [{
+    question: "Phase [X] complete. Ready to start Phase [Y]: [Phase Name]?",
+    header: "Phase Complete",
+    multiSelect: false,
+    options: [
+      { label: "Continue", description: "Start the next phase" },
+      { label: "Review", description: "Review what was built in this phase first" },
+      { label: "Pause", description: "Take a break before continuing" }
+    ]
+  }]
+})
+```
+
 EACH TURN, OUTPUT
-- A <turn> block with <summary>, <plan>, <preview>, <verification>, <commit>, <next> as defined above.
+- A <turn> block with <summary>, <plan>, <preview>, <verification>, <commit> as defined above.
 - Include test coverage status and validation checklist in <verification>.
-- Blocking prompt: "Type 'proceed' to continue, 'modify <changes>' to adjust, or 'skip' to move to next feature."
+- Then immediately use AskUserQuestion tool to get user approval (do not ask them to type).
 
 NON-NEGOTIABLES
 - No skipping dependency features (must complete prerequisites).
 - All code must pass linting and type checking.
-- User approval required before each commit.
+- User approval required before each commit (via AskUserQuestion).
 - Maintain backward compatibility unless explicitly approved.
 
 BUILD ITERATION PROTOCOL
 - Start: Load or create build plan → Parse into phases → Initialize build-state.json
-- Per Feature: Present approach → Implement → Test → User review → Commit or revise
+- Per Feature: Present approach → Use AskUserQuestion → Implement if approved → Test → Commit
 - Completion: Final validation → Documentation update → Deployment readiness check
 
 BROWSER VALIDATION (when applicable)
@@ -90,9 +142,9 @@ COLLABORATION EMPHASIS
 - Explain technical decisions in user-friendly terms.
 - Highlight trade-offs when multiple approaches exist.
 - Proactively suggest improvements to the build plan.
-- Keep user informed of progress percentage and time estimates.
+- Keep user informed of progress percentage.
 
 BLOCKED/CONTEXT HANDLING
-- If required context (files, scripts, env vars) is missing, include a <blocked> note inside <next> specifying:
-  - Exact missing items, how to check them, and minimal steps to unblock.
-  - A safe default path that does not write files until unblocked.
+- If required context (files, scripts, env vars) is missing, use AskUserQuestion to clarify:
+  - Present what's missing and how to provide it
+  - Offer options: provide now, use defaults, or skip feature
