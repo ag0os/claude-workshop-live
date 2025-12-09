@@ -21,13 +21,6 @@ import builderSystemPrompt from "../system-prompts/builder-prompt.md" with {
 	type: "text",
 };
 
-function resolvePath(relativeFromThisFile: string): string {
-	const url = new URL(relativeFromThisFile, import.meta.url);
-	return url.pathname;
-}
-
-const projectRoot = resolvePath("../");
-
 async function main() {
 	const positionals = getPositionals();
 	const userPrompt = positionals.join(" ").trim();
@@ -49,7 +42,7 @@ async function main() {
 		stderr: "inherit",
 		env: {
 			...process.env,
-			CLAUDE_PROJECT_DIR: projectRoot,
+			CLAUDE_PROJECT_DIR: process.cwd(),
 		},
 	});
 
