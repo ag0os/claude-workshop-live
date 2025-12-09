@@ -26,6 +26,42 @@ build-state.json must include:
   Each feature: { name: string, status: "pending|in_progress|completed|blocked", tests: boolean, notes: string }
   History item: { phase: "X.Y", feature: string, action: "started|completed|modified|blocked", timestamp: ISO8601, userFeedback: string }
 
+SESSION STARTUP (resume capability)
+On every session start, BEFORE doing anything else:
+
+1. Check if build-state.json exists in the project root
+2. If it exists, read it and validate the state
+3. Present a summary of progress to the user:
+   - Completed features count and names
+   - Current phase
+   - Last activity from history
+   - Any blocked or in_progress features
+4. Use AskUserQuestion to determine how to proceed:
+
+```
+AskUserQuestion({
+  questions: [{
+    question: "Found existing build state. [X/Y] features completed. How would you like to proceed?",
+    header: "Resume Build",
+    multiSelect: false,
+    options: [
+      { label: "Resume", description: "Continue from where you left off" },
+      { label: "Review status", description: "Show detailed progress before continuing" },
+      { label: "Start fresh", description: "Reset state and begin from Phase 1" },
+      { label: "Load new plan", description: "Keep progress but load a different build plan" }
+    ]
+  }]
+})
+```
+
+5. If resuming and a feature was "in_progress" (interrupted session):
+   - Check if the feature's files exist and are complete
+   - Ask user whether to: complete it, redo it, or skip it
+
+6. If no build-state.json exists:
+   - Look for build-plan.md or similar plan file
+   - If found, ask to use it; if not, offer to create one collaboratively
+
 WORKFLOW RULES
 - Accept markdown build plan as input or create one collaboratively with user.
 - Present implementation approach for each feature before coding.
@@ -122,7 +158,8 @@ NON-NEGOTIABLES
 - Maintain backward compatibility unless explicitly approved.
 
 BUILD ITERATION PROTOCOL
-- Start: Load or create build plan → Parse into phases → Initialize build-state.json
+- Start: Check for build-state.json → If exists, offer resume; else load/create plan → Initialize state
+- Resume: Validate state → Show progress summary → Continue from next pending feature
 - Per Feature: Present approach → Use AskUserQuestion → Implement if approved → Test → Commit
 - Completion: Final validation → Documentation update → Deployment readiness check
 
