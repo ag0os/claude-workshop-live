@@ -130,20 +130,50 @@ bun run agents/designer.ts "Design a color palette for a tech startup"
 
 Each agent is a specialized Claude instance with custom configurations:
 
+### Task-Specific Agents
 - **designer** - Design mode with Figma/Chrome DevTools integrations
-- **contain** - Isolated environment with custom settings
-- **planner** - Strategic planning mode
-- **builder** - Interactive building workflows
-- **chain** - Chain multiple Claude instances
-- **parallel** - Run parallel operations
-- **gemsum** - Gemini-powered summarization
-- **claude-mix** - Mixed capabilities mode
-- **orient** - Generates a comprehensive orientation map (markdown) for a concept, feature, or file
-- **brainstorm** - Generate 5 AI agent variations from your idea and select one to develop
-- **update-claudemd** - Maintain and update CLAUDE.md files following best practices
+- **builder** - Interactive building workflows from an agreed plan
+- **planner** - Strategic planning mode (generates plans, no implementation)
+- **refactor** - Internal-structure improvements that preserve external behavior
+- **contain** - Isolated environment with repo-scoped settings/MCP
+- **riff** - Design exploration through pseudo-code dialogue (language-agnostic)
+
+### Coordination Agents
+- **chain** - Chain multiple Claude instances (planner → contain)
+- **parallel** - Run parallel operations concurrently
+- **rails-backlog** - Rails Backlog Task Coordinator (analyze backlog.md + coordinate sub-agents)
+- **plan-coordinator** - Implementation Plan Coordinator (coordinate sub-agents step by step)
+
+### Analysis & Research Agents
+- **orient** - Generates orientation maps for concepts, features, or files
+- **brainstorm** - Generate 5 AI agent variations from your idea and select one
+- **design-audit** - Comprehensive design system/site styling audit
+- **github-examples** - Search GitHub for real-world examples and patterns
+- **expectations** - Launch Claude with quality expectations system prompt
+
+### Diagram Agents
 - **diagram-all** - Project-wide, exhaustive event flow diagram generator
 - **diagram-topic** - Generate diagrams limited to a single topic
 - **diagram-consolidate** - Verify, deduplicate, and bundle diagrams by topic
+
+### Inference Agents (Gemini-powered)
+- **infer** - Infer commands or hooks from conversation history (supports modes: commands, hooks)
+- **infer-commands** - Extract commands from the latest conversation
+- **gemsum** - Gemini-powered summarization
+- **claude-video** - Gemini-powered video analysis and instruction extraction
+
+### Utility Agents
+- **update-claudemd** - Maintain and update CLAUDE.md files following best practices
+- **claude-mix** - Repomix-focused flows for packing repos
+- **prompt-improver** - Turn prompts into three structured Markdown variations
+- **script-kit-gen** - Generate Script Kit scripts from ideas
+
+### Developer Utilities
+- **latest** - Find and inspect the latest conversation
+- **search** - Search through conversation history
+- **list-mcp-tools** - List tools available from an MCP endpoint
+- **print-key** - Print GEMINI_API_KEY (helper utility)
+- **jsonl-formatter** - JSONL parsing utilities and jq recipes
 
 ## Diagram Agents
 
@@ -319,7 +349,49 @@ This repo ships multiple focused agents wired to well-structured prompts. The pr
 
 - `contain`
   - Launches Claude with repo-scoped settings/MCP (container-style environment); consistent, reproducible context.
-  - Use for “standardized” sessions across machines or teams.
+  - Use for "standardized" sessions across machines or teams.
+
+- `riff` (system-prompts/riff-prompt.md)
+  - Design exploration through pseudo-code dialogue; based on Kasper Timm Hansen's "riffing" technique.
+  - Detects tech stack, explores problems through pseudo-code, surfaces design decisions and open questions.
+  - Use for early-stage design exploration before committing to implementation.
+
+- `rails-backlog` (system-prompts/rails-backlog-coordinator-prompt.md)
+  - Rails Backlog Task Coordinator; reads tasks from backlog.md and coordinates specialized sub-agents.
+  - Handles task analysis, sub-agent coordination, lifecycle management, and Definition of Done verification.
+  - Use for Rails projects with backlog-driven development workflows.
+
+- `plan-coordinator` (system-prompts/plan-coordinator-prompt.md)
+  - Implementation Plan Coordinator; takes a plan and coordinates sub-agents to execute each step.
+  - Handles plan parsing, progress tracking, and quality verification between steps.
+  - Use to execute multi-step plans with coordinated sub-agents.
+
+- `infer`
+  - Gemini-powered inference from conversation history; supports `--mode commands` or `--mode hooks`.
+  - Extracts user instructions into slash commands or identifies hook automation opportunities.
+  - Use to generate reusable commands/hooks from past conversations.
+
+- `design-audit` (system-prompts/design-audit-prompt.md)
+  - Comprehensive design system/site styling audit; scans for tokens, variables, themes, layouts, patterns.
+  - Writes navigable audit reports to `ai/design-audit/` without modifying app code.
+  - Use to understand and document existing design systems.
+
+- `prompt-improver` (system-prompts/prompt-improver-prompt.md)
+  - Turns a provided prompt/spec into three structured Markdown variations with winner rationale.
+  - Use to iterate on and improve prompts before use.
+
+- `script-kit-gen`
+  - Generates Script Kit scripts from ideas; writes to `~/.kenv/scripts/`.
+  - Use to quickly create automation scripts for Script Kit.
+
+- `expectations` (prompts/expectations.md)
+  - Launches Claude with quality expectations system prompt.
+  - Use to enforce quality standards in Claude sessions.
+
+- `list-mcp-tools`
+  - Lists tools available from an MCP endpoint via HTTP POST or CLI.
+  - Supports authenticated endpoints with `--token` flag.
+  - Use to discover available tools from MCP servers.
 
 - Conversation utilities: `latest`, `search`, `conv`
   - Map current repo to `~/.claude/projects` and inspect/export JSONL conversations.
