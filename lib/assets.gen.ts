@@ -6,6 +6,7 @@ import SP_refactor from '../system-prompts/refactor-prompt.md' with { type: 'tex
 import SP_planner from '../system-prompts/planner-prompt.md' with { type: 'text' }
 import SP_orient from '../system-prompts/orient-prompt.md' with { type: 'text' }
 import SP_designer from '../system-prompts/designer-prompt.md' with { type: 'text' }
+import SP_riff from '../system-prompts/riff-prompt.md' with { type: 'text' }
 import SP_diagram_topic from '../system-prompts/diagram-topic-prompt.md' with { type: 'text' }
 import SP_design_audit from '../system-prompts/design-audit-prompt.md' with { type: 'text' }
 import SP_brainstorm from '../system-prompts/brainstorm-prompt.md' with { type: 'text' }
@@ -64,6 +65,7 @@ export const SYSTEM_PROMPTS = {
   'prompt-improver': SP_prompt_improver,
   'rails-backlog-coordinator': SP_rails_backlog_coordinator,
   'refactor': SP_refactor,
+  'riff': SP_riff,
   'update-claudemd': SP_update_claudemd
 };
 export const PROMPTS = {
