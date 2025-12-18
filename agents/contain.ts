@@ -21,7 +21,7 @@
  *     Optionally publish an internal `npx` wrapper that runs this entrypoint with absolute paths.
  */
 
-import { spawn } from "bun";
+import { spawnClaudeAndWait } from "../lib";
 import containMcp from "../settings/contain.mcp.json" with { type: "json" };
 import containSettings from "../settings/contain.settings.json" with {
 	type: "json",
@@ -42,24 +42,9 @@ const args = [
 	...process.argv.slice(2),
 ];
 
-const child = spawn(["claude", ...args], {
-	stdin: "inherit",
-	stdout: "inherit",
-	stderr: "inherit",
-	env: {
-		...process.env,
-		CLAUDE_PROJECT_DIR: projectRoot,
-	},
+const exitCode = await spawnClaudeAndWait({
+	args,
+	env: { CLAUDE_PROJECT_DIR: projectRoot },
 });
 
-const onExit = () => {
-	try {
-		child.kill("SIGTERM");
-	} catch {}
-};
-
-process.on("SIGINT", onExit);
-process.on("SIGTERM", onExit);
-
-await child.exited;
-process.exit(child.exitCode ?? 0);
+process.exit(exitCode);

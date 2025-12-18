@@ -17,9 +17,13 @@
  */
 
 import { parseArgs } from "node:util";
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 import orientSettings from "../settings/orient.settings.json" with {
 	type: "json",
 };
@@ -157,27 +161,12 @@ async function main() {
 	);
 	const finalArgs = fullPrompt ? [...flags, fullPrompt] : [...flags];
 
-	const child = spawn(["claude", ...finalArgs], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: projectRoot,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args: finalArgs,
+		env: { CLAUDE_PROJECT_DIR: projectRoot },
 	});
 
-	const onExit = () => {
-		try {
-			child.kill("SIGTERM");
-		} catch {}
-	};
-
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await child.exited;
-	process.exit(child.exitCode ?? 0);
+	process.exit(exitCode);
 }
 
 await main();

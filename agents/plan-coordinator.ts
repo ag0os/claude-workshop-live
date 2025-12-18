@@ -17,8 +17,7 @@
  *   bun run agents/plan-coordinator.ts             # interactive mode
  */
 
-import { spawn } from "bun";
-import { buildClaudeFlags, getPositionals } from "../lib/flags";
+import { buildClaudeFlags, getPositionals, spawnClaudeAndWait } from "../lib";
 import planCoordinatorMcp from "../settings/plan-coordinator.mcp.json" with {
 	type: "json",
 };
@@ -50,24 +49,9 @@ const flags = buildClaudeFlags({
 // Add the prompt as positional argument if provided
 const args = userPrompt ? [...flags, userPrompt] : [...flags];
 
-const claudeProcess = spawn(["claude", ...args], {
-	stdin: "inherit",
-	stdout: "inherit",
-	stderr: "inherit",
-	env: {
-		...process.env,
-		CLAUDE_PROJECT_DIR: projectRoot,
-	},
+const exitCode = await spawnClaudeAndWait({
+	args,
+	env: { CLAUDE_PROJECT_DIR: projectRoot },
 });
 
-const onExit = () => {
-	try {
-		claudeProcess.kill("SIGTERM");
-	} catch {}
-};
-
-process.on("SIGINT", onExit);
-process.on("SIGTERM", onExit);
-
-await claudeProcess.exited;
-process.exit(claudeProcess.exitCode ?? 0);
+process.exit(exitCode);

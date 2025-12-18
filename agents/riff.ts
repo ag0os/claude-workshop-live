@@ -1,4 +1,5 @@
 #!/usr/bin/env -S bun run
+
 /**
  * RIFF: Design exploration through code dialogue
  *
@@ -17,10 +18,13 @@
  *   4. Output a design brief for implementation
  */
 
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
-
 import riffSystemPrompt from "../system-prompts/riff-prompt.md" with {
 	type: "text",
 };
@@ -50,26 +54,12 @@ async function main() {
 	);
 	const args = userPrompt ? [...flags, userPrompt] : [...flags];
 
-	const child = spawn(["claude", ...args], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: process.cwd(),
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args,
+		env: { CLAUDE_PROJECT_DIR: process.cwd() },
 	});
 
-	const onExit = () => {
-		try {
-			child.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await child.exited;
-	process.exit(child.exitCode ?? 0);
+	process.exit(exitCode);
 }
 
 await main();

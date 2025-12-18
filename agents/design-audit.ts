@@ -13,9 +13,13 @@
 
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 import expectationsDoc from "../prompts/expectations.md" with { type: "text" };
 import designAuditSettings from "../settings/design-audit.settings.json" with {
 	type: "json",
@@ -24,12 +28,6 @@ import designAuditSystemPrompt from "../system-prompts/design-audit-prompt.md" w
 	type: "text",
 };
 
-function resolvePath(relativeFromThisFile: string): string {
-	const url = new URL(relativeFromThisFile, import.meta.url);
-	return url.pathname;
-}
-
-const _projectRoot = resolvePath("../");
 const targetProject = process.cwd();
 const auditDir = join(targetProject, "ai", "design-audit");
 
@@ -73,28 +71,14 @@ async function main() {
 
 	const finalArgs = [...flags, userPrompt];
 
-	const child = spawn(["claude", ...finalArgs], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: targetProject,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args: finalArgs,
+		env: { CLAUDE_PROJECT_DIR: targetProject },
 	});
 
-	const onExit = () => {
-		try {
-			child.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await child.exited;
 	console.log("\n✨ Design audit complete!");
 	console.log(`📁 Reports saved to: ${auditDir}`);
-	process.exit(child.exitCode ?? 0);
+	process.exit(exitCode);
 }
 
 main().catch((err) => {

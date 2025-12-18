@@ -2,17 +2,14 @@
 
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import { assetsFor } from "../lib/assets";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
-
-function resolvePath(relativeFromThisFile: string): string {
-	const url = new URL(relativeFromThisFile, import.meta.url);
-	return url.pathname;
-}
-
-const _projectRoot = resolvePath("../");
 
 // Get the current working directory (the project to analyze)
 const targetProject = process.cwd();
@@ -95,27 +92,14 @@ async function main() {
 	const finalArgs = [...flags, userPrompt];
 
 	// Spawn Claude with diagram generation settings
-	const claudeProcess = spawn(["claude", ...finalArgs], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: targetProject,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args: finalArgs,
+		env: { CLAUDE_PROJECT_DIR: targetProject },
 	});
 
-	const onExit = () => {
-		try {
-			claudeProcess.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await claudeProcess.exited;
 	console.log(`\n✨ Event flow diagram generation complete!`);
 	console.log(`📁 Diagrams saved to: ${diagramsDir}`);
+	process.exit(exitCode);
 }
 
 main().catch(console.error);

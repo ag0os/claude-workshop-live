@@ -22,6 +22,7 @@ import { spawn } from "bun";
 import chalk from "chalk";
 import Table from "cli-table3";
 import ora from "ora";
+import { spawnClaude } from "../lib";
 import { buildClaudeFlags, parsedArgs } from "../lib/flags";
 
 // Parse our agent-specific arguments, ignoring claude-specific ones
@@ -278,14 +279,14 @@ async function runClaudeCommand(prompt: string): Promise<string> {
 		claudeFlags,
 	);
 
-	const proc = spawn(["claude", ...flags, prompt], {
-		stdin: "inherit",
+	const { process: proc, cleanup } = spawnClaude({
+		args: [...flags, prompt],
 		stdout: "pipe",
-		stderr: "inherit",
 	});
 
-	const stdoutText = await new Response(proc.stdout).text();
+	const stdoutText = await new Response(proc.stdout as ReadableStream).text();
 	const exitCode = await proc.exited;
+	cleanup();
 
 	if (exitCode !== 0) {
 		throw new Error(`Claude command failed with exit code ${exitCode}`);
@@ -309,7 +310,7 @@ async function runJqFilter(
 	proc.stdin.write(jsonlData);
 	proc.stdin.end();
 
-	const stdoutText = await new Response(proc.stdout).text();
+	const stdoutText = await new Response(proc.stdout as ReadableStream).text();
 	const exitCode = await proc.exited;
 
 	if (exitCode !== 0) {

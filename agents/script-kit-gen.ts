@@ -2,10 +2,14 @@
 
 import os from "node:os";
 import path from "node:path";
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import { assetsFor } from "../lib/assets";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 
 const KENV_SCRIPTS_DIR = path.join(os.homedir(), ".kenv", "scripts");
 
@@ -53,26 +57,13 @@ async function main() {
 	const finalArgs = userPrompt ? [...flags, userPrompt] : [...flags];
 
 	// Spawn Claude with brainstorm settings
-	const claudeProcess = spawn(["claude", ...finalArgs], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: projectRoot,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args: finalArgs,
+		env: { CLAUDE_PROJECT_DIR: projectRoot },
 	});
 
-	const onExit = () => {
-		try {
-			claudeProcess.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await claudeProcess.exited;
 	console.log(`\n✨ Script Kit generation session completed`);
+	process.exit(exitCode);
 }
 
 main().catch(console.error);

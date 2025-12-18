@@ -1,4 +1,5 @@
 #!/usr/bin/env -S bun run
+
 /**
  * PLANNER: Interactive implementation plan creator
  *
@@ -10,10 +11,13 @@
  *   bun run agents/planner.ts "build a todo app" # with initial prompt
  */
 
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
-
 import plannerSystemPrompt from "../system-prompts/planner-prompt.md" with {
 	type: "text",
 };
@@ -43,26 +47,12 @@ async function main() {
 	);
 	const args = userPrompt ? [...flags, userPrompt] : [...flags];
 
-	const child = spawn(["claude", ...args], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: process.cwd(),
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args,
+		env: { CLAUDE_PROJECT_DIR: process.cwd() },
 	});
 
-	const onExit = () => {
-		try {
-			child.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await child.exited;
-	process.exit(child.exitCode ?? 0);
+	process.exit(exitCode);
 }
 
 await main();

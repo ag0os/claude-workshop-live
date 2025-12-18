@@ -2,17 +2,15 @@
 
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import { assetsFor } from "../lib/assets";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 
-function resolvePath(relativeFromThisFile: string): string {
-	const url = new URL(relativeFromThisFile, import.meta.url);
-	return url.pathname;
-}
-
-const _projectRoot = resolvePath("../");
 const targetProject = process.cwd();
 const diagramsRoot = join(targetProject, "ai", "diagrams");
 const consolidatedDir = diagramsRoot;
@@ -71,27 +69,14 @@ async function main() {
 	const flags = buildClaudeFlags(defaults, parsedArgs.values as ClaudeFlags);
 	const finalArgs = [...flags, userPrompt];
 
-	const claudeProcess = spawn(["claude", ...finalArgs], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: targetProject,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args: finalArgs,
+		env: { CLAUDE_PROJECT_DIR: targetProject },
 	});
 
-	const onExit = () => {
-		try {
-			claudeProcess.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await claudeProcess.exited;
 	console.log(`\n✨ Consolidation complete!`);
 	console.log(`📁 Consolidated diagrams saved to: ${consolidatedDir}`);
+	process.exit(exitCode);
 }
 
 main().catch(console.error);

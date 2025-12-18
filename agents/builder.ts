@@ -1,4 +1,5 @@
 #!/usr/bin/env -S bun run
+
 /**
  * BUILDER: Launch Claude with a build partner system prompt appended
  *
@@ -9,14 +10,17 @@
  *   bun run agents/builder.ts "<your build task>"
  */
 
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 import builderMcp from "../settings/builder.mcp.json" with { type: "json" };
 import builderSettings from "../settings/builder.settings.json" with {
 	type: "json",
 };
-
 import builderSystemPrompt from "../system-prompts/builder-prompt.md" with {
 	type: "text",
 };
@@ -36,26 +40,12 @@ async function main() {
 	);
 	const args = userPrompt ? [...flags, userPrompt] : [...flags];
 
-	const child = spawn(["claude", ...args], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: process.cwd(),
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args,
+		env: { CLAUDE_PROJECT_DIR: process.cwd() },
 	});
 
-	const onExit = () => {
-		try {
-			child.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await child.exited;
-	process.exit(child.exitCode ?? 0);
+	process.exit(exitCode);
 }
 
 await main();

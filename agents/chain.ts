@@ -1,4 +1,5 @@
 #!/usr/bin/env -S bun run
+
 /**
  * CHAIN: Run planner, then contain, passing the generated plan forward
  *
@@ -10,9 +11,14 @@
  *   bun run agents/chain.ts "<your prompt>"
  */
 
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaude,
+	spawnClaudeAndWait,
+} from "../lib";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 import containMcp from "../settings/contain.mcp.json" with { type: "json" };
 import containSettings from "../settings/contain.settings.json" with {
 	type: "json",
@@ -56,18 +62,16 @@ async function runPlannerAndGetPlan(userPrompt: string): Promise<string> {
 	);
 	const args = [...flags, userPrompt];
 
-	const proc = spawn(["claude", ...args], {
-		stdin: "inherit",
+	const { process: proc, cleanup } = spawnClaude({
+		args,
+		env: { CLAUDE_PROJECT_DIR: projectRoot },
 		stdout: "pipe",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: projectRoot,
-		},
 	});
 
-	const stdoutText = await new Response(proc.stdout).text();
+	const stdoutText = await new Response(proc.stdout as ReadableStream).text();
 	const exitCode = await proc.exited;
+	cleanup();
+
 	if (exitCode !== 0) {
 		throw new Error(`Planner exited with code ${exitCode}`);
 	}
@@ -106,26 +110,10 @@ async function runContainWithPlan(planText: string): Promise<number> {
 	);
 	const args = [...flags, initialPrompt];
 
-	const child = spawn(["claude", ...args], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: projectRoot,
-		},
+	return await spawnClaudeAndWait({
+		args,
+		env: { CLAUDE_PROJECT_DIR: projectRoot },
 	});
-
-	const onExit = () => {
-		try {
-			child.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await child.exited;
-	return child.exitCode ?? 0;
 }
 
 async function main() {

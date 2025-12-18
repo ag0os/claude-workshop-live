@@ -22,11 +22,12 @@ vid(){
   with_gemini /Users/johnlindquist/dev/claude-agents/bin/claude-video "$@"
 }
 */
-import { homedir } from "node:os";
+import { mkdtempSync, rmSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join, normalize } from "node:path";
-import { $ } from "bun";
-import { getPositionals, buildClaudeFlags } from "./flags"
-import type { ClaudeFlags } from "./claude-flags.types"
+import { $, spawn, type Subprocess } from "bun";
+import type { ClaudeFlags } from "./claude-flags.types";
+import { buildClaudeFlags } from "./flags";
 
 /**
  * Get the Claude projects path for the current working directory
@@ -52,18 +53,130 @@ export async function getClaudeProjectsPath(): Promise<string> {
 }
 
 /**
+ * Options for spawning Claude
+ */
+export interface SpawnClaudeOptions {
+  /** Command line arguments to pass to claude */
+  args?: string[];
+  /** Environment variables to set (merged with process.env) */
+  env?: Record<string, string>;
+  /** Working directory for the spawned process */
+  cwd?: string;
+  /** Set to "pipe" to capture stdout instead of inheriting */
+  stdout?: "inherit" | "pipe";
+  /** Set to "pipe" to capture stderr instead of inheriting */
+  stderr?: "inherit" | "pipe";
+}
+
+/**
+ * Result from spawnClaude including cleanup function
+ */
+export interface SpawnClaudeResult {
+  /** The spawned subprocess */
+  process: Subprocess;
+  /** Call this to clean up the temp directory (also called automatically on exit) */
+  cleanup: () => void;
+  /** The temp directory created for this process */
+  tmpDir: string;
+}
+
+/**
+ * Spawn Claude CLI with a clean temp directory to avoid file watcher errors.
+ *
+ * Claude Code CLI can fail to watch socket files (.sock) in the shared temp directory,
+ * causing unhandled promise rejection errors. This function creates an isolated temp
+ * directory for each spawned process.
+ *
+ * @param options - Spawn options
+ * @returns SpawnClaudeResult with process handle and cleanup function
+ *
+ * @example
+ * ```ts
+ * const { process, cleanup } = spawnClaude({
+ *   args: ["--settings", JSON.stringify(settings)],
+ *   env: { CLAUDE_PROJECT_DIR: projectRoot }
+ * });
+ *
+ * // Handle signals
+ * process.on("SIGINT", cleanup);
+ *
+ * await process.exited;
+ * cleanup();
+ * ```
+ */
+export function spawnClaude(options: SpawnClaudeOptions = {}): SpawnClaudeResult {
+  const { args = [], env = {}, cwd, stdout = "inherit", stderr = "inherit" } = options;
+
+  // Create a clean temp directory to avoid file watcher errors on socket files
+  const cleanTmpDir = mkdtempSync(join(tmpdir(), "claude-agent-"));
+
+  const process = spawn(["claude", ...args], {
+    stdin: "inherit",
+    stdout,
+    stderr,
+    cwd,
+    env: {
+      ...globalThis.process.env,
+      ...env,
+      TMPDIR: cleanTmpDir,
+    },
+  });
+
+  const cleanup = () => {
+    try {
+      rmSync(cleanTmpDir, { recursive: true, force: true });
+    } catch {
+      // Ignore cleanup errors
+    }
+  };
+
+  return { process, cleanup, tmpDir: cleanTmpDir };
+}
+
+/**
+ * Spawn Claude and wait for completion, handling cleanup automatically.
+ *
+ * This is a convenience wrapper around spawnClaude for simple use cases.
+ *
+ * @param options - Spawn options
+ * @returns Promise that resolves to the exit code
+ */
+export async function spawnClaudeAndWait(options: SpawnClaudeOptions = {}): Promise<number> {
+  const { process, cleanup } = spawnClaude(options);
+
+  const onExit = () => {
+    try {
+      process.kill("SIGTERM");
+    } catch {}
+    cleanup();
+  };
+
+  globalThis.process.on("SIGINT", onExit);
+  globalThis.process.on("SIGTERM", onExit);
+
+  await process.exited;
+  cleanup();
+
+  return process.exitCode ?? 0;
+}
+
+/**
  * Spawn Claude with given default flags and wait for completion
  * Automatically includes positionals from command line and merges with user flags
  * @param defaultFlags - Default flags object (see ClaudeFlags for available options)
  * @returns Exit code from the Claude process
+ * @deprecated Use spawnClaudeAndWait instead for better temp directory handling
  */
 export async function claude(prompt: string = "", defaultFlags: ClaudeFlags = {}) {
   // Build flags, merging defaults with user-provided flags
-  const flags = buildClaudeFlags(defaultFlags)
+  const flags = buildClaudeFlags(defaultFlags);
 
-  const proc = Bun.spawn(['claude', ...flags, prompt], {
-    stdio: ['inherit', 'inherit', 'inherit']
-  })
+  const { process, cleanup } = spawnClaude({
+    args: [...flags, prompt],
+  });
 
-  return await proc.exited
+  await process.exited;
+  cleanup();
+
+  return process.exitCode ?? 0;
 }

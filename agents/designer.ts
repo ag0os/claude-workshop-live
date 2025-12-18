@@ -1,4 +1,5 @@
 #!/usr/bin/env -S bun run
+
 /**
  * DESIGNER: Launch Claude with a design partner system prompt appended
  *
@@ -9,14 +10,17 @@
  *   bun run agents/designer.ts "<your design task>"
  */
 
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 import designerMcp from "../settings/designer.mcp.json" with { type: "json" };
 import designerSettings from "../settings/designer.settings.json" with {
 	type: "json",
 };
-
 import designerSystemPrompt from "../system-prompts/designer-prompt.md" with {
 	type: "text",
 };
@@ -44,26 +48,12 @@ async function main() {
 	);
 	const args = userPrompt ? [...flags, userPrompt] : [...flags];
 
-	const child = spawn(["claude", ...args], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: projectRoot,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args,
+		env: { CLAUDE_PROJECT_DIR: projectRoot },
 	});
 
-	const onExit = () => {
-		try {
-			child.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await child.exited;
-	process.exit(child.exitCode ?? 0);
+	process.exit(exitCode);
 }
 
 await main();

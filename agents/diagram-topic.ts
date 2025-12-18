@@ -2,10 +2,14 @@
 
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { spawn } from "bun";
+import {
+	buildClaudeFlags,
+	getPositionals,
+	parsedArgs,
+	spawnClaudeAndWait,
+} from "../lib";
 import { assetsFor } from "../lib/assets";
 import type { ClaudeFlags } from "../lib/claude-flags.types";
-import { buildClaudeFlags, getPositionals, parsedArgs } from "../lib/flags";
 
 function slugify(input: string): string {
 	return input
@@ -14,13 +18,6 @@ function slugify(input: string): string {
 		.replace(/(^-|-$)+/g, "")
 		.slice(0, 80);
 }
-
-function resolvePath(relativeFromThisFile: string): string {
-	const url = new URL(relativeFromThisFile, import.meta.url);
-	return url.pathname;
-}
-
-const _projectRoot = resolvePath("../");
 
 // Get args: first positional is required topic, rest optional focus/filter details
 const positionals = getPositionals();
@@ -82,27 +79,14 @@ async function main() {
 	const flags = buildClaudeFlags(defaults, parsedArgs.values as ClaudeFlags);
 	const finalArgs = [...flags, userPrompt];
 
-	const claudeProcess = spawn(["claude", ...finalArgs], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: targetProject,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args: finalArgs,
+		env: { CLAUDE_PROJECT_DIR: targetProject },
 	});
 
-	const onExit = () => {
-		try {
-			claudeProcess.kill("SIGTERM");
-		} catch {}
-	};
-	process.on("SIGINT", onExit);
-	process.on("SIGTERM", onExit);
-
-	await claudeProcess.exited;
 	console.log(`\n✨ Topic-focused diagram generation complete!`);
 	console.log(`📁 Diagrams saved to: ${diagramsDir}`);
+	process.exit(exitCode);
 }
 
 main().catch(console.error);

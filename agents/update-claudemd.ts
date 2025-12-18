@@ -2,8 +2,7 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { spawn } from "bun";
-import { buildClaudeFlags, getPositionals } from "../lib/flags";
+import { buildClaudeFlags, getPositionals, spawnClaudeAndWait } from "../lib";
 import updateClaudeMdMcp from "../settings/update-claudemd.mcp.json" with {
 	type: "json",
 };
@@ -77,18 +76,13 @@ async function main() {
 	const args = [...flags, finalPrompt];
 
 	// Spawn Claude with update-claudemd settings
-	const claudeProcess = spawn(["claude", ...args], {
-		stdin: "inherit",
-		stdout: "inherit",
-		stderr: "inherit",
-		env: {
-			...process.env,
-			CLAUDE_PROJECT_DIR: projectDir,
-		},
+	const exitCode = await spawnClaudeAndWait({
+		args,
+		env: { CLAUDE_PROJECT_DIR: projectDir },
 	});
 
-	await claudeProcess.exited;
 	console.log(`\n✅ CLAUDE.md maintenance session completed`);
+	process.exit(exitCode);
 }
 
 main().catch(console.error);
